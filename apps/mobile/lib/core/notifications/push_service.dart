@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:unifiedpush/unifiedpush.dart';
+import 'package:unifiedpush_platform_interface/data/push_endpoint.dart';
+import 'package:unifiedpush_platform_interface/data/push_message.dart';
+import 'package:unifiedpush_platform_interface/data/failed_reason.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -76,11 +79,11 @@ class PushService {
     }
   }
 
-  void _onNewEndpoint(String endpoint, String instance) async {
-    print("Received new UnifiedPush endpoint: $endpoint");
+  void _onNewEndpoint(PushEndpoint endpoint, String instance) async {
+    print("Received new UnifiedPush endpoint: ${endpoint.endpoint}");
     
     // Save to local storage
-    await _storage.write(key: 'push_endpoint', value: endpoint);
+    await _storage.write(key: 'push_endpoint', value: endpoint.endpoint);
     
     // Send endpoint to the backend to register the device.
     try {
@@ -95,7 +98,7 @@ class PushService {
             'Authorization': 'Bearer $token',
           },
           body: jsonEncode({
-            'endpoint': endpoint,
+            'endpoint': endpoint.endpoint,
             'pushProvider': 'UNIFIED_PUSH',
             'platform': 'ANDROID',
           }),
@@ -106,23 +109,23 @@ class PushService {
     }
   }
 
-  void _onRegistrationFailed(String instance) {
-    print("UnifiedPush registration failed for instance: $instance");
+  void _onRegistrationFailed(FailedReason reason, String instance) {
+    print("UnifiedPush registration failed for instance: $instance. Reason: $reason");
   }
 
   void _onUnregistered(String instance) {
     print("UnifiedPush unregistered for instance: $instance");
   }
 
-  void _onMessage(String message, String instance) {
-    print("UnifiedPush message received: $message");
+  void _onMessage(PushMessage message, String instance) {
+    print("UnifiedPush message received: ${message.message}");
     try {
-      final payload = jsonDecode(message);
+      final payload = jsonDecode(message.message);
       _showLocalNotification(payload);
     } catch (e) {
       print("Failed to parse push message: $e");
       // If it's raw text, show it as a simple notification
-      _showLocalNotification({'title': 'إشعار جديد', 'message': message});
+      _showLocalNotification({'title': 'إشعار جديد', 'message': message.message});
     }
   }
 
