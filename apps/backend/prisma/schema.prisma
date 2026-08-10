@@ -1,0 +1,1442 @@
+// ═══════════════════════════════════════════════════════════════
+// منصة إدارة النقل المدرسي SaaS - Prisma Schema
+// ═══════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════
+
+enum SchoolStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+  ARCHIVED
+}
+
+enum SubscriptionStatusEnum {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+}
+
+enum TripStatusEnum {
+  SCHEDULED
+  READY
+  STARTED
+  PAUSED
+  ARRIVED_AT_SCHOOL
+  COMPLETED
+  CANCELLED
+}
+
+enum StudentTripStatusEnum {
+  WAITING
+  BOARDED
+  ABSENT
+  EXCUSED_ABSENCE
+  ARRIVED_AT_SCHOOL
+  BOARDED_RETURN
+  ON_BUS
+  DROPPED_OFF
+  DELIVERY_FAILED
+}
+
+enum AddressRequestStatusEnum {
+  NEW
+  UNDER_REVIEW
+  NEEDS_CHANGES
+  APPROVED
+  REJECTED
+  SCHEDULED
+  EXPIRED
+  CANCELLED
+}
+
+enum SyncStatusEnum {
+  PENDING
+  PROCESSING
+  SYNCED
+  FAILED
+  CONFLICT
+  NEEDS_REVIEW
+}
+
+enum PaymentStatusEnum {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  EXEMPT
+  CANCELLED
+}
+
+enum LocationTypeEnum {
+  HOME
+  PICKUP
+  DROPOFF
+  CUSTOM
+  TEMPORARY
+}
+
+enum TripTypeEnum {
+  MORNING
+  RETURN
+}
+
+enum AbsenceTypeEnum {
+  MORNING_ONLY
+  RETURN_ONLY
+  FULL_DAY
+  MULTIPLE_DAYS
+  PARENT_PICKUP
+}
+
+enum TransportSubTypeEnum {
+  MORNING_ONLY
+  RETURN_ONLY
+  ROUND_TRIP
+  MONTHLY
+  TERM
+  YEARLY
+}
+
+enum TicketStatusEnum {
+  OPEN
+  IN_PROGRESS
+  WAITING_RESPONSE
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum TicketPriorityEnum {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum InvoiceStatusEnum {
+  DRAFT
+  ISSUED
+  PAID
+  PARTIALLY_PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum DeviceTypeEnum {
+  IOS
+  ANDROID
+  WEB
+}
+
+enum GPSSourceEnum {
+  DRIVER_PHONE
+  SUPERVISOR_PHONE
+  EXTERNAL_DEVICE
+}
+
+enum AuditActionEnum {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  APPROVE
+  REJECT
+  SUSPEND
+  ACTIVATE
+  SUPPORT_ACCESS
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  FEATURE_TOGGLE
+  SUBSCRIPTION_CHANGE
+  PAYMENT_RECORD
+  EXPORT_DATA
+}
+
+enum NotificationTypeEnum {
+  TRIP_STARTED
+  BUS_APPROACHING
+  STUDENT_BOARDED
+  STUDENT_ABSENT
+  STUDENT_ARRIVED_SCHOOL
+  STUDENT_BOARDED_RETURN
+  STUDENT_DROPPED_OFF
+  DELIVERY_FAILED
+  BUS_CHANGED
+  ROUTE_CHANGED
+  TRIP_DELAYED
+  ADDRESS_REQUEST_APPROVED
+  ADDRESS_REQUEST_REJECTED
+  ADDRESS_REQUEST_CHANGES
+  PAYMENT_DUE
+  PAYMENT_RECEIVED
+  FEE_CREATED
+  ABSENCE_APPROVED
+  ABSENCE_REJECTED
+  SUBSCRIPTION_EXPIRING
+  SUBSCRIPTION_EXPIRED
+  SYSTEM_ANNOUNCEMENT
+  SUPPORT_REPLY
+}
+
+enum PlatformRoleEnum {
+  PLATFORM_OWNER
+  PLATFORM_ADMIN
+  PLATFORM_SUPPORT
+  PLATFORM_ACCOUNTANT
+}
+
+enum SchoolRoleEnum {
+  SCHOOL_OWNER
+  SCHOOL_ADMIN
+  TRANSPORT_MANAGER
+  ACCOUNTANT
+  SUPERVISOR
+  DRIVER
+  PARENT
+  DATA_ENTRY
+}
+
+enum GenderEnum {
+  MALE
+  FEMALE
+}
+
+enum SelectionMethodEnum {
+  MAP_PIN
+  GPS_AUTO
+  ADDRESS_SEARCH
+  MANUAL_ENTRY
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PLATFORM-LEVEL MODELS
+// ═══════════════════════════════════════════════════════════════
+
+/// مستخدمو مالك المنصة
+model PlatformUser {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  passwordHash   String
+  fullName       String
+  phone          String?
+  role           PlatformRoleEnum
+  isActive       Boolean          @default(true)
+  lastLoginAt    DateTime?
+  lastLoginIp    String?
+  avatarUrl      String?
+
+  mustChangePassword  Boolean   @default(true)
+  passwordChangedAt   DateTime?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  auditLogs      AuditLog[]       @relation("AuditPerformer")
+  supportMessages SupportMessage[] @relation("PlatformSupportAgent")
+
+  @@index([email])
+  @@index([role])
+  @@map("platform_users")
+}
+
+/// المدارس المستضافة على المنصة
+model School {
+  id               String       @id @default(cuid())
+  nameAr           String
+  nameEn           String?
+  slug             String       @unique
+  status           SchoolStatus @default(TRIAL)
+  logo             String?
+  phone            String?
+  email            String?
+  address          String?
+  city             String?
+  region           String?
+  country          String       @default("SA")
+  taxNumber        String?
+  commercialReg    String?
+  timezone         String       @default("Asia/Riyadh")
+  academicYear     String?
+  maxStudents      Int          @default(0)
+  maxBuses         Int          @default(0)
+  trialEndsAt      DateTime?
+  suspendedAt      DateTime?
+  suspendedReason  String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  deletedAt        DateTime?
+  createdBy        String?
+
+  // Relations
+  subscriptions    Subscription[]
+  featureOverrides SchoolFeatureOverride[]
+  schoolUsers      SchoolUser[]
+  students         Student[]
+  guardians        Guardian[]
+  buses            Bus[]
+  drivers          Driver[]
+  supervisors      Supervisor[]
+  regions          Region[]
+  stops            Stop[]
+  routes           Route[]
+  trips            Trip[]
+  notifications    Notification[]
+  transportFees    TransportFee[]
+  payments         Payment[]
+  receipts         Receipt[]
+  supportTickets   SupportTicket[]
+  auditLogs        AuditLog[]
+  schoolSettings   SchoolSetting[]
+  absenceRequests  AbsenceRequest[]
+  addressRequests  AddressChangeRequest[]
+  syncOperations   SyncOperation[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("schools")
+}
+
+/// باقات الاشتراك SaaS
+model Plan {
+  id                String    @id @default(cuid())
+  nameAr            String
+  nameEn            String?
+  description       String?
+  priceMonthly      Decimal   @db.Decimal(10, 2)
+  priceAnnual       Decimal   @db.Decimal(10, 2)
+  maxStudents       Int
+  maxBuses          Int
+  maxRoutes         Int       @default(100)
+  maxUsers          Int       @default(50)
+  isPopular         Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  sortOrder         Int       @default(0)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+
+  features          PlanFeature[]
+  subscriptions     Subscription[]
+
+  @@map("plans")
+}
+
+/// ميزات الباقة
+model PlanFeature {
+  id          String @id @default(cuid())
+  planId      String
+  featureId   String
+  isEnabled   Boolean @default(true)
+  limitValue  Int?
+
+  plan        Plan              @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature     FeatureDefinition @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, featureId])
+  @@map("plan_features")
+}
+
+/// الاشتراكات
+model Subscription {
+  id               String                 @id @default(cuid())
+  schoolId         String
+  planId           String
+  status           SubscriptionStatusEnum @default(TRIAL)
+  startDate        DateTime
+  endDate          DateTime
+  trialEndDate     DateTime?
+  autoRenew        Boolean                @default(false)
+  amountPaid       Decimal                @db.Decimal(10, 2) @default(0)
+  billingCycle     String                 @default("ANNUAL")
+  cancelledAt      DateTime?
+  cancelledReason  String?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  school           School                 @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  plan             Plan                   @relation(fields: [planId], references: [id])
+  history          SubscriptionHistory[]
+  invoices         Invoice[]
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([endDate])
+  @@map("subscriptions")
+}
+
+/// تاريخ تغييرات الاشتراك
+model SubscriptionHistory {
+  id             String   @id @default(cuid())
+  subscriptionId String
+  action         String
+  fromPlanId     String?
+  toPlanId       String?
+  fromStatus     String?
+  toStatus       String?
+  notes          String?
+  performedBy    String?
+  createdAt      DateTime @default(now())
+
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@map("subscription_history")
+}
+
+/// الفواتير الضريبية
+model Invoice {
+  id               String            @id @default(cuid())
+  invoiceNumber    String            @unique
+  subscriptionId   String
+  schoolName       String
+  planName         String
+  amount           Decimal           @db.Decimal(10, 2)
+  taxRate          Decimal           @db.Decimal(5, 2) @default(15)
+  taxAmount        Decimal           @db.Decimal(10, 2)
+  totalAmount      Decimal           @db.Decimal(10, 2)
+  status           InvoiceStatusEnum @default(DRAFT)
+  issueDate        DateTime
+  dueDate          DateTime
+  paidAt           DateTime?
+  notes            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  subscription     Subscription      @relation(fields: [subscriptionId], references: [id])
+  platformPayments PlatformPayment[]
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([issueDate])
+  @@map("invoices")
+}
+
+/// مدفوعات المنصة (رسوم الاشتراك)
+model PlatformPayment {
+  id             String   @id @default(cuid())
+  invoiceId      String
+  amount         Decimal  @db.Decimal(10, 2)
+  paymentMethod  String
+  referenceNumber String?
+  notes          String?
+  paidAt         DateTime @default(now())
+  recordedBy     String?
+  createdAt      DateTime @default(now())
+
+  invoice        Invoice  @relation(fields: [invoiceId], references: [id])
+
+  @@index([invoiceId])
+  @@map("platform_payments")
+}
+
+/// تعريف الميزات القابلة للتفعيل
+model FeatureDefinition {
+  id            String    @id @default(cuid())
+  key           String    @unique
+  nameAr        String
+  nameEn        String?
+  description   String?
+  category      String    @default("general")
+  isGlobal      Boolean   @default(true)
+  defaultValue  Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  planFeatures     PlanFeature[]
+  schoolOverrides  SchoolFeatureOverride[]
+
+  @@map("feature_definitions")
+}
+
+/// تخصيص ميزات لمدرسة معينة
+model SchoolFeatureOverride {
+  id         String  @id @default(cuid())
+  schoolId   String
+  featureId  String
+  isEnabled  Boolean
+  limitValue Int?
+  notes      String?
+  setBy      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  school     School            @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  feature    FeatureDefinition @relation(fields: [featureId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, featureId])
+  @@map("school_feature_overrides")
+}
+
+/// الجلسات
+model Session {
+  id              String   @id @default(cuid())
+  userId          String
+  userType        String   // "platform" | "school"
+  ipAddress       String?
+  userAgent       String?
+  deviceInfo      String?
+  lastActiveAt    DateTime @default(now())
+  expiresAt       DateTime
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("sessions")
+}
+
+/// رموز التحديث
+model RefreshToken {
+  id           String    @id @default(cuid())
+  tokenHash    String    @unique
+  userId       String
+  userType     String    // "platform" | "school"
+  deviceInfo   String?
+  ipAddress    String?
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  replacedById String?
+  createdAt    DateTime  @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+/// تذاكر الدعم الفني
+model SupportTicket {
+  id           String             @id @default(cuid())
+  ticketNumber String             @unique
+  schoolId     String?
+  title        String
+  description  String
+  category     String             @default("general")
+  priority     TicketPriorityEnum @default(MEDIUM)
+  status       TicketStatusEnum   @default(OPEN)
+  assignedTo   String?
+  resolvedAt   DateTime?
+  closedAt     DateTime?
+  createdBy    String
+  createdByType String            // "platform" | "school"
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  school       School?           @relation(fields: [schoolId], references: [id])
+  messages     SupportMessage[]
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([priority])
+  @@map("support_tickets")
+}
+
+/// رسائل تذاكر الدعم
+model SupportMessage {
+  id           String   @id @default(cuid())
+  ticketId     String
+  senderId     String
+  senderType   String   // "platform" | "school"
+  senderName   String
+  content      String
+  attachments  Json?
+  isInternal   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  ticket       SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  platformAgent PlatformUser? @relation("PlatformSupportAgent", fields: [senderId], references: [id])
+
+  @@index([ticketId])
+  @@map("support_messages")
+}
+
+/// سجل التدقيق
+model AuditLog {
+  id          String          @id @default(cuid())
+  action      AuditActionEnum
+  entityType  String
+  entityId    String?
+  schoolId    String?
+  userId      String?
+  userType    String?         // "platform" | "school"
+  userName    String?
+  userRole    String?
+  ipAddress   String?
+  userAgent   String?
+  oldData     Json?
+  newData     Json?
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+
+  school      School?       @relation(fields: [schoolId], references: [id])
+  platformUser PlatformUser? @relation("AuditPerformer", fields: [userId], references: [id])
+
+  @@index([schoolId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCHOOL-LEVEL MODELS
+// ═══════════════════════════════════════════════════════════════
+
+/// مستخدمو المدرسة (جميع الأدوار)
+model SchoolUser {
+  id             String         @id @default(cuid())
+  schoolId       String
+  email          String
+  passwordHash   String
+  fullName       String
+  phone          String?
+  nationalId     String?
+  role           SchoolRoleEnum
+  isActive       Boolean        @default(true)
+  lastLoginAt    DateTime?
+  lastLoginIp    String?
+  avatarUrl      String?
+
+  mustChangePassword  Boolean   @default(true)
+  passwordChangedAt   DateTime?
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+  createdBy      String?
+
+  school         School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  permissions    SchoolUserPermission[]
+  driver         Driver?
+  supervisor     Supervisor?
+  guardian       Guardian?
+  pushDevices    PushDevice[]
+
+  @@unique([schoolId, email])
+  @@index([schoolId])
+  @@index([role])
+  @@index([email])
+  @@map("school_users")
+}
+
+/// صلاحيات مخصصة لمستخدم مدرسة
+model SchoolUserPermission {
+  id           String @id @default(cuid())
+  schoolUserId String
+  permission   String
+  isGranted    Boolean @default(true)
+  createdAt    DateTime @default(now())
+
+  schoolUser   SchoolUser @relation(fields: [schoolUserId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolUserId, permission])
+  @@map("school_user_permissions")
+}
+
+/// الطلاب
+model Student {
+  id              String       @id @default(cuid())
+  schoolId        String
+  schoolNumber    String
+  fullName        String
+  gender          GenderEnum?
+  grade           String?
+  classSection    String?
+  dateOfBirth     DateTime?
+  photoUrl        String?
+  medicalNotes    String?
+  specialNeeds    String?
+  isActive        Boolean      @default(true)
+  transportStatus String       @default("ACTIVE")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?
+  createdBy       String?
+
+  school          School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  guardianLinks   StudentGuardian[]
+  locations       StudentLocation[]
+  routeStudents   RouteStudent[]
+  tripStudents    TripStudent[]
+  absenceRequests AbsenceRequest[]
+  addressRequests AddressChangeRequest[]
+  transportSubs   TransportSubscription[]
+  fees            TransportFee[]
+
+  @@unique([schoolId, schoolNumber])
+  @@index([schoolId])
+  @@index([fullName])
+  @@map("students")
+}
+
+/// أولياء الأمور
+model Guardian {
+  id           String   @id @default(cuid())
+  schoolId     String
+  schoolUserId String?  @unique
+  fullName     String
+  phone        String
+  email        String?
+  nationalId   String?
+  relation     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+
+  school       School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser   SchoolUser?     @relation(fields: [schoolUserId], references: [id])
+  studentLinks StudentGuardian[]
+
+  @@index([schoolId])
+  @@index([phone])
+  @@map("guardians")
+}
+
+/// العلاقة بين الطالب وولي الأمر
+model StudentGuardian {
+  id          String  @id @default(cuid())
+  studentId   String
+  guardianId  String
+  relation    String  @default("parent")
+  isPrimary   Boolean @default(false)
+  canPickup   Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  guardian    Guardian @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, guardianId])
+  @@map("student_guardians")
+}
+
+/// مواقع الطلاب
+model StudentLocation {
+  id                String              @id @default(cuid())
+  studentId         String
+  locationType      LocationTypeEnum
+  latitude          Decimal             @db.Decimal(10, 7)
+  longitude         Decimal             @db.Decimal(10, 7)
+  accuracy          Decimal?            @db.Decimal(8, 2)
+  regionName        String?
+  neighborhood      String?
+  addressDescription String?
+  nearestLandmark   String?
+  accessNotes       String?
+  selectionMethod   SelectionMethodEnum?
+  isPrimary         Boolean             @default(false)
+  isActive          Boolean             @default(true)
+  approvedAt        DateTime?
+  approvedBy        String?
+  validFrom         DateTime?
+  validTo           DateTime?
+  archivedAt        DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  student           Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@index([locationType])
+  @@map("student_locations")
+}
+
+/// طلبات تغيير العنوان
+model AddressChangeRequest {
+  id              String                   @id @default(cuid())
+  schoolId        String
+  studentId       String
+  requestedBy     String
+  status          AddressRequestStatusEnum @default(NEW)
+  locationType    LocationTypeEnum         @default(HOME)
+  newLatitude     Decimal                  @db.Decimal(10, 7)
+  newLongitude    Decimal                  @db.Decimal(10, 7)
+  newAddress      String?
+  newLandmark     String?
+  newAccessNotes  String?
+  selectionMethod SelectionMethodEnum?
+  reason          String?
+  reviewNotes     String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  oldLocationId   String?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  school          School                   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student         Student                  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([status])
+  @@map("address_change_requests")
+}
+
+/// المناطق الجغرافية
+model Region {
+  id          String   @id @default(cuid())
+  schoolId    String
+  nameAr      String
+  nameEn      String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  stops       Stop[]
+
+  @@unique([schoolId, nameAr])
+  @@index([schoolId])
+  @@map("regions")
+}
+
+/// نقاط التجمع
+model Stop {
+  id          String   @id @default(cuid())
+  schoolId    String
+  regionId    String?
+  nameAr      String
+  nameEn      String?
+  latitude    Decimal  @db.Decimal(10, 7)
+  longitude   Decimal  @db.Decimal(10, 7)
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  region      Region?  @relation(fields: [regionId], references: [id])
+  routeStops  RouteStop[]
+
+  @@index([schoolId])
+  @@index([regionId])
+  @@map("stops")
+}
+
+/// الحافلات
+model Bus {
+  id              String   @id @default(cuid())
+  schoolId        String
+  busNumber       String
+  plateNumber     String
+  model           String?
+  year            Int?
+  color           String?
+  capacity        Int      @default(30)
+  currentLoad     Int      @default(0)
+  status          String   @default("ACTIVE")
+  gpsDeviceId     String?
+  insuranceExpiry DateTime?
+  licenseExpiry   DateTime?
+  lastMaintenanceAt DateTime?
+  photoUrl        String?
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  driverId        String?
+  driver          Driver?  @relation(fields: [driverId], references: [id])
+  supervisorId    String?
+  supervisor      Supervisor? @relation(fields: [supervisorId], references: [id])
+  routes          Route[]
+  trips           Trip[]
+
+  @@unique([schoolId, busNumber])
+  @@unique([schoolId, plateNumber])
+  @@index([schoolId])
+  @@index([status])
+  @@map("buses")
+}
+
+/// السائقون
+model Driver {
+  id             String   @id @default(cuid())
+  schoolId       String
+  schoolUserId   String   @unique
+  licenseNumber  String?
+  licenseExpiry  DateTime?
+  nationalId     String?
+  phone          String?
+  emergencyPhone String?
+  status         String   @default("ACTIVE")
+  hireDate       DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+
+  school         School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id])
+  buses          Bus[]
+  trips          Trip[]
+
+  @@index([schoolId])
+  @@map("drivers")
+}
+
+/// المشرفات
+model Supervisor {
+  id             String   @id @default(cuid())
+  schoolId       String
+  schoolUserId   String   @unique
+  nationalId     String?
+  phone          String?
+  emergencyPhone String?
+  status         String   @default("ACTIVE")
+  hireDate       DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deletedAt      DateTime?
+
+  school         School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id])
+  buses          Bus[]
+  trips          Trip[]
+
+  @@index([schoolId])
+  @@map("supervisors")
+}
+
+/// المسارات
+model Route {
+  id                String   @id @default(cuid())
+  schoolId          String
+  nameAr            String
+  nameEn            String?
+  description       String?
+  busId             String?
+  tripType          TripTypeEnum @default(MORNING)
+  estimatedDuration Int?     // بالدقائق
+  distanceKm        Decimal? @db.Decimal(8, 2)
+  polyline          String?  // Google encoded polyline
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+
+  school            School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  bus               Bus?     @relation(fields: [busId], references: [id])
+  stops             RouteStop[]
+  students          RouteStudent[]
+  trips             Trip[]
+
+  @@index([schoolId])
+  @@index([busId])
+  @@map("routes")
+}
+
+/// محطات المسار (مرتبة)
+model RouteStop {
+  id                   String   @id @default(cuid())
+  routeId              String
+  stopId               String
+  order                Int
+  estimatedArrivalTime String?  // مثل "06:45"
+  waitDuration         Int      @default(3) // بالدقائق
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  route                Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  stop                 Stop     @relation(fields: [stopId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, stopId])
+  @@unique([routeId, order])
+  @@index([routeId])
+  @@map("route_stops")
+}
+
+/// الطلاب المسجلون في المسار
+model RouteStudent {
+  id         String   @id @default(cuid())
+  routeId    String
+  studentId  String
+  stopId     String?
+  order      Int?
+  isActive   Boolean  @default(true)
+  assignedAt DateTime @default(now())
+  removedAt  DateTime?
+
+  route      Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  student    Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, studentId])
+  @@index([routeId])
+  @@index([studentId])
+  @@map("route_students")
+}
+
+/// الرحلات اليومية
+model Trip {
+  id              String         @id @default(cuid())
+  schoolId        String
+  routeId         String
+  busId           String
+  driverId        String?
+  supervisorId    String?
+  tripType        TripTypeEnum
+  tripDate        DateTime       @db.Date
+  status          TripStatusEnum @default(SCHEDULED)
+  scheduledStartTime String?     // "06:30"
+  actualStartTime DateTime?
+  actualEndTime   DateTime?
+  startLatitude   Decimal?       @db.Decimal(10, 7)
+  startLongitude  Decimal?       @db.Decimal(10, 7)
+  endLatitude     Decimal?       @db.Decimal(10, 7)
+  endLongitude    Decimal?       @db.Decimal(10, 7)
+  totalStudents   Int            @default(0)
+  boardedCount    Int            @default(0)
+  absentCount     Int            @default(0)
+  notes           String?
+  cancelReason    String?
+  cancelledBy     String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  school          School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  route           Route          @relation(fields: [routeId], references: [id])
+  bus             Bus            @relation(fields: [busId], references: [id])
+  driver          Driver?        @relation(fields: [driverId], references: [id])
+  supervisor      Supervisor?    @relation(fields: [supervisorId], references: [id])
+  tripStudents    TripStudent[]
+  tripEvents      TripEvent[]
+
+  @@index([schoolId])
+  @@index([tripDate])
+  @@index([status])
+  @@index([routeId])
+  @@index([busId])
+  @@index([driverId])
+  @@index([supervisorId])
+  @@map("trips")
+}
+
+/// حالة الطالب في الرحلة
+model TripStudent {
+  id             String                @id @default(cuid())
+  tripId         String
+  studentId      String
+  status         StudentTripStatusEnum @default(WAITING)
+  boardedAt      DateTime?
+  boardedLatitude  Decimal?            @db.Decimal(10, 7)
+  boardedLongitude Decimal?            @db.Decimal(10, 7)
+  droppedOffAt   DateTime?
+  droppedOffLatitude  Decimal?         @db.Decimal(10, 7)
+  droppedOffLongitude Decimal?         @db.Decimal(10, 7)
+  arrivedSchoolAt DateTime?
+  absentMarkedAt DateTime?
+  absentReason   String?
+  notes          String?
+  recordedBy     String?
+  stopOrder      Int?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  trip           Trip                  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  student        Student               @relation(fields: [studentId], references: [id])
+
+  @@unique([tripId, studentId])
+  @@index([tripId])
+  @@index([studentId])
+  @@index([status])
+  @@map("trip_students")
+}
+
+/// أحداث الرحلة (لا تُحذف - append only)
+model TripEvent {
+  id            String   @id @default(cuid())
+  tripId        String
+  studentId     String?
+  eventType     String   // BOARD, DROP_OFF, ABSENT, ARRIVE_SCHOOL, etc.
+  operationId   String   @unique // لمنع التكرار في المزامنة
+  previousStatus String?
+  newStatus     String
+  latitude      Decimal? @db.Decimal(10, 7)
+  longitude     Decimal? @db.Decimal(10, 7)
+  accuracy      Decimal? @db.Decimal(8, 2)
+  recordedBy    String
+  recordedByName String?
+  deviceTimestamp DateTime
+  serverTimestamp DateTime @default(now())
+  isOnline      Boolean  @default(true)
+  source        String   @default("ONLINE") // ONLINE | OFFLINE_SYNC
+  isReversal    Boolean  @default(false)
+  reversesEventId String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@index([studentId])
+  @@index([operationId])
+  @@index([deviceTimestamp])
+  @@map("trip_events")
+}
+
+/// طلبات الغياب المسبق
+model AbsenceRequest {
+  id            String           @id @default(cuid())
+  schoolId      String
+  studentId     String
+  requestedBy   String
+  absenceType   AbsenceTypeEnum
+  startDate     DateTime         @db.Date
+  endDate       DateTime?        @db.Date
+  reason        String?
+  status        String           @default("PENDING") // PENDING, APPROVED, REJECTED
+  approvedBy    String?
+  approvedAt    DateTime?
+  rejectionReason String?
+  notes         String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  school        School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student       Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([startDate])
+  @@index([status])
+  @@map("absence_requests")
+}
+
+/// اشتراكات النقل (المالية)
+model TransportSubscription {
+  id              String             @id @default(cuid())
+  studentId       String
+  subscriptionType TransportSubTypeEnum
+  academicYear    String
+  term            String?
+  startDate       DateTime           @db.Date
+  endDate         DateTime           @db.Date
+  amount          Decimal            @db.Decimal(10, 2)
+  discount        Decimal            @db.Decimal(10, 2) @default(0)
+  netAmount       Decimal            @db.Decimal(10, 2)
+  isActive        Boolean            @default(true)
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  student         Student            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("transport_subscriptions")
+}
+
+/// رسوم النقل
+model TransportFee {
+  id              String           @id @default(cuid())
+  schoolId        String
+  studentId       String
+  feeType         String
+  description     String?
+  amount          Decimal          @db.Decimal(10, 2)
+  paidAmount      Decimal          @db.Decimal(10, 2) @default(0)
+  remainingAmount Decimal          @db.Decimal(10, 2)
+  status          PaymentStatusEnum @default(PENDING)
+  dueDate         DateTime?
+  academicYear    String?
+  term            String?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  createdBy       String?
+
+  school          School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student         Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  payments        Payment[]
+
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([status])
+  @@map("transport_fees")
+}
+
+/// الدفعات المالية
+model Payment {
+  id              String   @id @default(cuid())
+  schoolId        String
+  transportFeeId  String
+  idempotencyKey  String   @unique
+  receiptNumber   String?
+  amount          Decimal  @db.Decimal(10, 2)
+  paymentMethod   String
+  referenceNumber String?
+  paidAt          DateTime @default(now())
+  notes           String?
+  recordedBy      String
+  recordedByName  String?
+  isReversed      Boolean  @default(false)
+  reversedAt      DateTime?
+  reversalReason  String?
+  reversedBy      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  school          School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  transportFee    TransportFee @relation(fields: [transportFeeId], references: [id])
+  receipt         Receipt?
+
+  @@index([schoolId])
+  @@index([transportFeeId])
+  @@index([idempotencyKey])
+  @@map("payments")
+}
+
+/// سندات القبض
+model Receipt {
+  id             String   @id @default(cuid())
+  schoolId       String
+  paymentId      String   @unique
+  receiptNumber  String
+  studentName    String
+  guardianName   String
+  amount         Decimal  @db.Decimal(10, 2)
+  paymentMethod  String
+  issuedBy       String
+  issuedByName   String?
+  issuedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  school         School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  payment        Payment  @relation(fields: [paymentId], references: [id])
+
+  @@unique([schoolId, receiptNumber])
+  @@index([schoolId])
+  @@map("receipts")
+}
+
+/// الإشعارات
+model Notification {
+  id           String               @id @default(cuid())
+  schoolId     String?
+  type         NotificationTypeEnum
+  title        String
+  body         String
+  data         Json?
+  isGlobal     Boolean              @default(false)
+  targetRole   String?
+  targetUserId String?
+  tripId       String?
+  studentId    String?
+  senderId     String?
+  senderName   String?
+  actionType   String?
+  entityType   String?
+  entityId     String?
+  createdAt    DateTime             @default(now())
+  expiresAt    DateTime?
+
+  school       School?              @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  recipients   NotificationRecipient[]
+  deliveries   NotificationDelivery[]
+
+  @@index([schoolId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+/// مستلمو الإشعار
+model NotificationRecipient {
+  id             String   @id @default(cuid())
+  notificationId String
+  userId         String
+  isRead         Boolean  @default(false)
+  readAt         DateTime?
+  isPushed       Boolean  @default(false)
+  pushedAt       DateTime?
+  createdAt      DateTime @default(now())
+
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId])
+  @@index([userId, isRead])
+  @@map("notification_recipients")
+}
+
+/// تفضيلات الإشعارات
+model NotificationPreference {
+  id         String   @id @default(cuid())
+  userId     String
+  userType   String   // "platform" | "school"
+  type       NotificationTypeEnum
+  inApp      Boolean  @default(true)
+  push       Boolean  @default(true)
+  email      Boolean  @default(false)
+  sms        Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, type])
+  @@map("notification_preferences")
+}
+
+/// تسجيل الأجهزة للإشعارات (PushDevice)
+model PushDevice {
+  id           String     @id @default(cuid())
+  schoolId     String?
+  userId       String
+  deviceId     String?
+  platform     String?
+  pushProvider String     @default("UNIFIED_PUSH") // UNIFIED_PUSH, NTFY
+  endpoint     String
+  isActive     Boolean    @default(true)
+  lastSeenAt   DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  schoolUser   SchoolUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])
+  @@index([userId])
+  @@index([endpoint])
+  @@map("push_devices")
+}
+
+/// سجل التسليم
+model NotificationDelivery {
+  id             String       @id @default(cuid())
+  notificationId String
+  userId         String
+  deviceId       String?
+  channel        String       // SOCKET, SELF_HOSTED_PUSH, IN_APP
+  status         String       // PENDING, DELIVERED, FAILED
+  attempts       Int          @default(0)
+  lastAttemptAt  DateTime?
+  deliveredAt    DateTime?
+  errorCode      String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@index([userId])
+  @@index([status])
+  @@map("notification_deliveries")
+}
+
+/// عمليات المزامنة (Offline Sync)
+model SyncOperation {
+  id               String         @id @default(cuid())
+  operationId      String         @unique
+  schoolId         String
+  tripId           String?
+  studentId        String?
+  userId           String
+  action           String
+  entityType       String
+  entityId         String?
+  payload          Json
+  deviceTimestamp   DateTime
+  serverTimestamp   DateTime?
+  latitude         Decimal?       @db.Decimal(10, 7)
+  longitude        Decimal?       @db.Decimal(10, 7)
+  status           SyncStatusEnum @default(PENDING)
+  retryCount       Int            @default(0)
+  maxRetries       Int            @default(5)
+  lastError        String?
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  conflictData     Json?
+  batchId          String?
+  priority         Int            @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  school           School         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([operationId])
+  @@index([status])
+  @@index([tripId])
+  @@index([batchId])
+  @@map("sync_operations")
+}
+
+/// إعدادات المدرسة
+model SchoolSetting {
+  id        String   @id @default(cuid())
+  schoolId  String
+  key       String
+  value     String
+  category  String   @default("general")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, key])
+  @@index([schoolId])
+  @@map("school_settings")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  userType   String   // "platform" | "school"
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([tokenHash])
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+enum DemoRequestStatusEnum {
+  NEW
+  CONTACTED
+  APPROVED
+  REJECTED
+  CONVERTED
+}
+
+model DemoRequest {
+  id           String                @id @default(cuid())
+  schoolName   String
+  contactName  String
+  phone        String
+  email        String
+  city         String
+  studentCount Int?
+  busCount     Int?
+  message      String?
+  status       DemoRequestStatusEnum @default(NEW)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  @@map("demo_requests")
+}
+

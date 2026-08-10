@@ -1,0 +1,121 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: school_transport_staging
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres_password@postgres:5432/school_transport_staging?schema=public
+      - REDIS_URL=redis://redis:6379
+      - JWT_ACCESS_SECRET=staging_access_secret_12345678901234567890
+      - JWT_REFRESH_SECRET=staging_refresh_secret_12345678901234567890
+      - API_PREFIX=api/v1
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:3002,http://localhost:3003
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  school-dashboard:
+    build:
+      context: ./apps/school-dashboard
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+    depends_on:
+      - backend
+
+  platform-admin:
+    build:
+      context: ./apps/platform-admin
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+    depends_on:
+      - backend
+
+  public-website:
+    build:
+      context: ./apps/public-website
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
+    depends_on:
+      - backend
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    restart: unless-stopped
+    command: serve
+    environment:
+      - NTFY_BASE_URL=http://localhost:3004
+      - NTFY_LISTEN_HTTP=:80
+      # Require authentication for writing, restrict reading to topic subscribers
+      - NTFY_AUTH_DEFAULT_ACCESS=deny-all
+      - NTFY_AUTH_FILE=/var/lib/ntfy/user.db
+      - NTFY_UPSTREAM_BASE_URL=
+    ports:
+      - "3004:80"
+    volumes:
+      - ntfy_staging_data:/var/lib/ntfy
+      - ntfy_staging_cache:/var/cache/ntfy
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  ntfy_staging_data:
+  ntfy_staging_cache:

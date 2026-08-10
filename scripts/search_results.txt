@@ -1,0 +1,454 @@
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\references\debug.md:13: Outputs details about your Prisma environment, including:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\references\dev.md:26: | `--detach` / `-d` | Run in background | `false` |
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\references\dev.md:53: prisma dev --detach
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\SKILL.md:102: # Start in background (detached)
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\SKILL.md:103: prisma dev --detach
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-cli\SKILL.md:222: See individual rule files for detailed command documentation:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\client-methods.md:180: See `transactions.md` for details.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\client-methods.md:184: See `raw-queries.md` for details.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\constructor.md:113: Use `comments` only for SQL providers. This is the clean way to add trace or query-shape metadata without changing your query calls.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\filters.md:232: metadata: {
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\filters.md:240: metadata: {
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\query-options.md:170: See `filters.md` for detailed filter operators.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\references\raw-queries.md:151: SELECT * FROM "User" WHERE metadata->>'theme' = 'dark'
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\SKILL.md:170: Detailed API documentation:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-client-api\SKILL.md:216: Pick the category from the table above, then open the matching reference file for implementation details and examples.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\references\app-deploy-cli.md:93: - Workspace metadata and the active workspace pointer live beside it as `auth.context.json`.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\references\create-prisma.md:102: Preserve generated framework runtime files and `prisma.compute.ts` unless you are intentionally changing the deploy target. For framework-specific deploy/runtime details, read [`frameworks.md`](frameworks.md).
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\references\frameworks.md:194: Preserve these details:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\references\troubleshooting.md:164: - Active workspace metadata sidecar: `~/Library/Application Support/prisma/auth.context.json`.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-compute\SKILL.md:117: - `auth-storage-awareness` - Local OAuth credentials live in the platform auth file, with workspace metadata in a sidecar context file. Project pins live in `.prisma/local.json`, and CLI app/project state lives in `.prisma/cli/state.json` near `prisma.compute.ts` when present.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-database-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-database-setup\SKILL.md:177: See individual rule files for detailed setup instructions:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-driver-adapter-implementation\SKILL.md:3: description: Required reference for Prisma v7 driver adapter work. Use when implementing or modifying adapters, adding database drivers, or touching SqlDriverAdapter/Transaction interfaces. Contains critical contract details not inferable from code examples — including the transaction lifecycle protocol, error mapping requirements, and verification checklist. Existing implementations do not replace this skill.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-driver-adapter-implementation\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-driver-adapter-implementation\SKILL.md:198: // Extract column metadata
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-driver-adapter-implementation\SKILL.md:446: When the driver doesn't provide type metadata, infer from JS values:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-driver-adapter-implementation\SKILL.md:501: detail: undefined,
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-mongodb-upgrade\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-mongodb-upgrade\SKILL.md:39: detailed in the references.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-mongodb-upgrade\SKILL.md:71: | `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail |
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres\references\console-and-connections.md:11: Many Prisma Postgres tasks are quickest in the Console: viewing Studio data, checking metrics, and retrieving connection details. This avoids unnecessary API or CLI work for simple operational tasks.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres\SKILL.md:49: - Retrieve direct connection details from the project UI
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres\SKILL.md:130: Detailed guidance lives in:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\references\api-basics.md:34: { "id": "proj_bbb", "type": "project", "name": "Beta" }
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\references\auth.md:44: OAuth is used when acting on behalf of a user, typically in partner/integrator flows. See the `prisma-postgres-integrator` skill for OAuth details.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\references\endpoints.md:3: Management API endpoint details for database setup workflows.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\references\endpoints.md:123: Use to check database status after creation or to retrieve database details.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\SKILL.md:62: Read `references/auth.md` for details on service token creation.
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\SKILL.md:167: schema: path.join(import.meta.dirname, 'prisma', 'schema.prisma'),
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\SKILL.md:256: Detailed API and usage information is in:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-postgres-setup\SKILL.md:261: references/endpoints.md        — Endpoint details for projects, databases, connections, regions
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-upgrade-v7\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.agents\skills\prisma-upgrade-v7\SKILL.md:104: Detailed migration guides for each breaking change:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\references\debug.md:13: Outputs details about your Prisma environment, including:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\references\dev.md:26: | `--detach` / `-d` | Run in background | `false` |
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\references\dev.md:53: prisma dev --detach
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\SKILL.md:102: # Start in background (detached)
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\SKILL.md:103: prisma dev --detach
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-cli\SKILL.md:222: See individual rule files for detailed command documentation:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\client-methods.md:180: See `transactions.md` for details.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\client-methods.md:184: See `raw-queries.md` for details.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\constructor.md:113: Use `comments` only for SQL providers. This is the clean way to add trace or query-shape metadata without changing your query calls.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\filters.md:232: metadata: {
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\filters.md:240: metadata: {
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\query-options.md:170: See `filters.md` for detailed filter operators.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\references\raw-queries.md:151: SELECT * FROM "User" WHERE metadata->>'theme' = 'dark'
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\SKILL.md:170: Detailed API documentation:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-client-api\SKILL.md:216: Pick the category from the table above, then open the matching reference file for implementation details and examples.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\references\app-deploy-cli.md:93: - Workspace metadata and the active workspace pointer live beside it as `auth.context.json`.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\references\create-prisma.md:102: Preserve generated framework runtime files and `prisma.compute.ts` unless you are intentionally changing the deploy target. For framework-specific deploy/runtime details, read [`frameworks.md`](frameworks.md).
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\references\frameworks.md:194: Preserve these details:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\references\troubleshooting.md:164: - Active workspace metadata sidecar: `~/Library/Application Support/prisma/auth.context.json`.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-compute\SKILL.md:117: - `auth-storage-awareness` - Local OAuth credentials live in the platform auth file, with workspace metadata in a sidecar context file. Project pins live in `.prisma/local.json`, and CLI app/project state lives in `.prisma/cli/state.json` near `prisma.compute.ts` when present.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-database-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-database-setup\SKILL.md:177: See individual rule files for detailed setup instructions:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-driver-adapter-implementation\SKILL.md:3: description: Required reference for Prisma v7 driver adapter work. Use when implementing or modifying adapters, adding database drivers, or touching SqlDriverAdapter/Transaction interfaces. Contains critical contract details not inferable from code examples — including the transaction lifecycle protocol, error mapping requirements, and verification checklist. Existing implementations do not replace this skill.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-driver-adapter-implementation\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-driver-adapter-implementation\SKILL.md:198: // Extract column metadata
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-driver-adapter-implementation\SKILL.md:446: When the driver doesn't provide type metadata, infer from JS values:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-driver-adapter-implementation\SKILL.md:501: detail: undefined,
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-mongodb-upgrade\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-mongodb-upgrade\SKILL.md:39: detailed in the references.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-mongodb-upgrade\SKILL.md:71: | `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail |
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres\references\console-and-connections.md:11: Many Prisma Postgres tasks are quickest in the Console: viewing Studio data, checking metrics, and retrieving connection details. This avoids unnecessary API or CLI work for simple operational tasks.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres\SKILL.md:49: - Retrieve direct connection details from the project UI
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres\SKILL.md:130: Detailed guidance lives in:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\references\api-basics.md:34: { "id": "proj_bbb", "type": "project", "name": "Beta" }
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\references\auth.md:44: OAuth is used when acting on behalf of a user, typically in partner/integrator flows. See the `prisma-postgres-integrator` skill for OAuth details.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\references\endpoints.md:3: Management API endpoint details for database setup workflows.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\references\endpoints.md:123: Use to check database status after creation or to retrieve database details.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\SKILL.md:62: Read `references/auth.md` for details on service token creation.
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\SKILL.md:167: schema: path.join(import.meta.dirname, 'prisma', 'schema.prisma'),
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\SKILL.md:256: Detailed API and usage information is in:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-postgres-setup\SKILL.md:261: references/endpoints.md        — Endpoint details for projects, databases, connections, regions
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-upgrade-v7\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.claude\skills\prisma-upgrade-v7\SKILL.md:104: Detailed migration guides for each breaking change:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\references\debug.md:13: Outputs details about your Prisma environment, including:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\references\dev.md:26: | `--detach` / `-d` | Run in background | `false` |
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\references\dev.md:53: prisma dev --detach
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\SKILL.md:102: # Start in background (detached)
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\SKILL.md:103: prisma dev --detach
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-cli\SKILL.md:222: See individual rule files for detailed command documentation:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\client-methods.md:180: See `transactions.md` for details.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\client-methods.md:184: See `raw-queries.md` for details.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\constructor.md:113: Use `comments` only for SQL providers. This is the clean way to add trace or query-shape metadata without changing your query calls.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\filters.md:232: metadata: {
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\filters.md:240: metadata: {
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\query-options.md:170: See `filters.md` for detailed filter operators.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\references\raw-queries.md:151: SELECT * FROM "User" WHERE metadata->>'theme' = 'dark'
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\SKILL.md:170: Detailed API documentation:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-client-api\SKILL.md:216: Pick the category from the table above, then open the matching reference file for implementation details and examples.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\references\app-deploy-cli.md:93: - Workspace metadata and the active workspace pointer live beside it as `auth.context.json`.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\references\create-prisma.md:102: Preserve generated framework runtime files and `prisma.compute.ts` unless you are intentionally changing the deploy target. For framework-specific deploy/runtime details, read [`frameworks.md`](frameworks.md).
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\references\frameworks.md:194: Preserve these details:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\references\troubleshooting.md:164: - Active workspace metadata sidecar: `~/Library/Application Support/prisma/auth.context.json`.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-compute\SKILL.md:117: - `auth-storage-awareness` - Local OAuth credentials live in the platform auth file, with workspace metadata in a sidecar context file. Project pins live in `.prisma/local.json`, and CLI app/project state lives in `.prisma/cli/state.json` near `prisma.compute.ts` when present.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-database-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-database-setup\SKILL.md:177: See individual rule files for detailed setup instructions:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-driver-adapter-implementation\SKILL.md:3: description: Required reference for Prisma v7 driver adapter work. Use when implementing or modifying adapters, adding database drivers, or touching SqlDriverAdapter/Transaction interfaces. Contains critical contract details not inferable from code examples — including the transaction lifecycle protocol, error mapping requirements, and verification checklist. Existing implementations do not replace this skill.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-driver-adapter-implementation\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-driver-adapter-implementation\SKILL.md:198: // Extract column metadata
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-driver-adapter-implementation\SKILL.md:446: When the driver doesn't provide type metadata, infer from JS values:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-driver-adapter-implementation\SKILL.md:501: detail: undefined,
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-mongodb-upgrade\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-mongodb-upgrade\SKILL.md:39: detailed in the references.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-mongodb-upgrade\SKILL.md:71: | `references/decision-stay-or-migrate.md` | The full decision framing, blocker checks, and stay-hygiene detail |
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres\references\console-and-connections.md:11: Many Prisma Postgres tasks are quickest in the Console: viewing Studio data, checking metrics, and retrieving connection details. This avoids unnecessary API or CLI work for simple operational tasks.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres\SKILL.md:49: - Retrieve direct connection details from the project UI
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres\SKILL.md:130: Detailed guidance lives in:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\references\api-basics.md:34: { "id": "proj_bbb", "type": "project", "name": "Beta" }
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\references\auth.md:44: OAuth is used when acting on behalf of a user, typically in partner/integrator flows. See the `prisma-postgres-integrator` skill for OAuth details.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\references\endpoints.md:3: Management API endpoint details for database setup workflows.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\references\endpoints.md:123: Use to check database status after creation or to retrieve database details.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\SKILL.md:62: Read `references/auth.md` for details on service token creation.
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\SKILL.md:167: schema: path.join(import.meta.dirname, 'prisma', 'schema.prisma'),
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\SKILL.md:256: Detailed API and usage information is in:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-postgres-setup\SKILL.md:261: references/endpoints.md        — Endpoint details for projects, databases, connections, regions
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-upgrade-v7\SKILL.md:5: metadata:
+D:\school-transport-saas\apps\backend\.windsurf\skills\prisma-upgrade-v7\SKILL.md:104: Detailed migration guides for each breaking change:
+D:\school-transport-saas\apps\backend\generated\prisma\client.ts:16: globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
+D:\school-transport-saas\apps\backend\generated\prisma\internal\prismaNamespace.ts:415: meta: {
+D:\school-transport-saas\apps\backend\generated\prisma\internal\prismaNamespace.ts:529: * SQL commenter plugins that add metadata to SQL queries as comments.
+D:\school-transport-saas\apps\backend\package-lock.json:34: "reflect-metadata": "^0.2.2",
+D:\school-transport-saas\apps\backend\package-lock.json:93: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:199: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:243: "integrity": "sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==",
+D:\school-transport-saas\apps\backend\package-lock.json:259: "gensync": "^1.0.0-beta.2",
+D:\school-transport-saas\apps\backend\package-lock.json:508: "node_modules/@babel/plugin-syntax-import-meta": {
+D:\school-transport-saas\apps\backend\package-lock.json:510: "resolved": "https://registry.npmjs.org/@babel/plugin-syntax-import-meta/-/plugin-syntax-import-meta-7.10.4.tgz",
+D:\school-transport-saas\apps\backend\package-lock.json:1098: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1120: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1148: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1171: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1194: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1216: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1248: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1270: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1293: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1323: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1346: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1370: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1395: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1413: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1699: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:1853: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2186: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2224: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2336: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2361: "reflect-metadata": "^0.1.12 || ^0.2.0",
+D:\school-transport-saas\apps\backend\package-lock.json:2364: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2424: "reflect-metadata": "^0.1.12 || ^0.2.0",
+D:\school-transport-saas\apps\backend\package-lock.json:2427: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2461: "reflect-metadata": "^0.1.12 || ^0.2.0"
+D:\school-transport-saas\apps\backend\package-lock.json:2463: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2539: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2567: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2645: "reflect-metadata": "^0.1.12 || ^0.2.0"
+D:\school-transport-saas\apps\backend\package-lock.json:2647: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2700: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2717: "reflect-metadata": "^0.1.13 || ^0.2.0"
+D:\school-transport-saas\apps\backend\package-lock.json:2734: "reflect-metadata": "^0.1.12 || ^0.2.0",
+D:\school-transport-saas\apps\backend\package-lock.json:2737: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:2826: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3057: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3078: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3100: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3123: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3146: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3165: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:3181: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:4146: "integrity": "sha512-BpcOjWCJub6nRZUS2zA20pmLvjtqAtGejETaIyRLiZiQf++cbrjltLA5NN/xaXfqeOBOSlMFbemIl5/S5tljmg==",
+D:\school-transport-saas\apps\backend\package-lock.json:4272: "integrity": "sha512-iOwlRo9vnp6R6ohHQS11n0NnfdXx/omhkocmIfaPRpQhKZ+3BDMkkdRVh53qjkFkpPddf+FETA28NwGN7l5l+w==",
+D:\school-transport-saas\apps\backend\package-lock.json:4817: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:5079: "@babel/plugin-syntax-import-meta": "^7.10.4",
+D:\school-transport-saas\apps\backend\package-lock.json:5108: "@babel/core": "^7.11.0 || ^8.0.0-beta.1"
+D:\school-transport-saas\apps\backend\package-lock.json:5365: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:5952: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:6152: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:6167: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:6683: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:6727: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:6844: "node_modules/etag": {
+D:\school-transport-saas\apps\backend\package-lock.json:6846: "resolved": "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz",
+D:\school-transport-saas\apps\backend\package-lock.json:6938: "etag": "^1.8.1",
+D:\school-transport-saas\apps\backend\package-lock.json:7102: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:7398: "version": "1.0.0-beta.2",
+D:\school-transport-saas\apps\backend\package-lock.json:7399: "resolved": "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz",
+D:\school-transport-saas\apps\backend\package-lock.json:8100: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:8180: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:8225: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:8478: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:9390: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:9460: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:9714: "reflect-metadata": "*",
+D:\school-transport-saas\apps\backend\package-lock.json:10162: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:10506: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:10698: "node_modules/reflect-metadata": {
+D:\school-transport-saas\apps\backend\package-lock.json:10700: "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.2.2.tgz",
+D:\school-transport-saas\apps\backend\package-lock.json:10937: "etag": "^1.8.1",
+D:\school-transport-saas\apps\backend\package-lock.json:11558: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:11626: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:11835: "@babel/core": ">=7.0.0-beta.0 <8",
+D:\school-transport-saas\apps\backend\package-lock.json:11843: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:11896: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:11937: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:12305: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:12401: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:12458: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package-lock.json:12631: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\backend\package.json:45: "reflect-metadata": "^0.2.2",
+D:\school-transport-saas\apps\backend\prisma\schema.prisma:582: metadata    Json?
+D:\school-transport-saas\apps\backend\prisma\schema.prisma:950: estimatedArrivalTime String?  // مثل "06:45"
+D:\school-transport-saas\apps\backend\prisma\schema.prisma:1080: metadata      Json?
+D:\school-transport-saas\apps\backend\prisma\schema.prisma:1131: netAmount       Decimal            @db.Decimal(10, 2)
+D:\school-transport-saas\apps\backend\prisma\seed.ts:50: { key: 'live_tracking', nameAr: 'التتبع المباشر', category: 'tracking', defaultValue: true },
+D:\school-transport-saas\apps\backend\prisma\seed.ts:143: const basicFeatures = ['live_tracking', 'parent_app', 'supervisor_app', 'driver_app', 'address_change', 'absence_requests', 'push_notifications', 'financial_module', 'csv_export', 'multi_route', 'emergency_reports'];
+D:\school-transport-saas\apps\backend\prisma\seed.ts:505: estimatedArrivalTime: '06:30',
+D:\school-transport-saas\apps\backend\prisma\seed.ts:516: estimatedArrivalTime: '06:45',
+D:\school-transport-saas\apps\backend\prisma\seed.ts:573: { key: 'gps_update_interval_seconds', value: '15', category: 'tracking' },
+D:\school-transport-saas\apps\backend\src\absence-requests\absence-requests.controller.ts:45: @ApiOperation({ summary: 'Get absence request details' })
+D:\school-transport-saas\apps\backend\src\address-requests\address-requests.controller.ts:45: @ApiOperation({ summary: 'Get address change request details' })
+D:\school-transport-saas\apps\backend\src\app.module.ts:32: import { TrackingModule } from './tracking/tracking.module';
+D:\school-transport-saas\apps\backend\src\app.module.ts:69: TrackingModule,
+D:\school-transport-saas\apps\backend\src\buses\buses.controller.ts:51: @ApiOperation({ summary: 'Get bus details' })
+D:\school-transport-saas\apps\backend\src\common\decorators\index.ts:1: import { createParamDecorator, ExecutionContext, SetMetadata, applyDecorators } from '@nestjs/common';
+D:\school-transport-saas\apps\backend\src\common\decorators\index.ts:19: export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+D:\school-transport-saas\apps\backend\src\common\decorators\index.ts:21: export const Roles = (...roles: any[]) => SetMetadata(ROLES_KEY, roles);
+D:\school-transport-saas\apps\backend\src\common\decorators\index.ts:23: export const Permissions = (...permissions: string[]) => SetMetadata(PERMISSIONS_KEY, permissions);
+D:\school-transport-saas\apps\backend\src\common\decorators\index.ts:37: meta: {
+D:\school-transport-saas\apps\backend\src\common\decorators\require-feature.decorator.ts:1: import { SetMetadata } from '@nestjs/common';
+D:\school-transport-saas\apps\backend\src\common\decorators\require-feature.decorator.ts:3: export const RequireFeature = (feature: string) => SetMetadata(FEATURE_KEY, feature);
+D:\school-transport-saas\apps\backend\src\common\filters\all-exceptions.filter.ts:30: let details = null;
+D:\school-transport-saas\apps\backend\src\common\filters\all-exceptions.filter.ts:37: details = (exceptionResponse as any).error || details;
+D:\school-transport-saas\apps\backend\src\common\filters\all-exceptions.filter.ts:53: details: Array.isArray(message) ? message : details,
+D:\school-transport-saas\apps\backend\src\common\guards\authorization.guards.spec.ts:28: getAllAndOverride: jest
+D:\school-transport-saas\apps\backend\src\common\guards\authorization.guards.spec.ts:41: getAllAndOverride: jest
+D:\school-transport-saas\apps\backend\src\common\guards\feature.guard.ts:19: const requiredFeature = this.reflector.getAllAndOverride<string>(
+D:\school-transport-saas\apps\backend\src\common\guards\jwt-auth.guard.ts:17: const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+D:\school-transport-saas\apps\backend\src\common\guards\permissions.guard.ts:15: const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+D:\school-transport-saas\apps\backend\src\common\guards\roles.guard.ts:16: const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:14: meta?: any;
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:28: // If the data already has pagination metadata, handle it
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:33: 'meta' in data
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:38: meta: {
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:39: ...data.meta,
+D:\school-transport-saas\apps\backend\src\common\interceptors\response.interceptor.ts:49: meta: {
+D:\school-transport-saas\apps\backend\src\common\types\index.ts:5: meta: {
+D:\school-transport-saas\apps\backend\src\common\types\index.ts:16: meta?: any;
+D:\school-transport-saas\apps\backend\src\common\utils\pagination.util.ts:23: meta: {
+D:\school-transport-saas\apps\backend\src\drivers\drivers.controller.ts:46: @ApiOperation({ summary: 'Get driver details' })
+D:\school-transport-saas\apps\backend\src\emergency\emergency.service.ts:88: metadata: { resolutionNotes: notes || 'تم إرسال حافلة بديلة وتأمين سلامة الطلاب بنجاح' },
+D:\school-transport-saas\apps\backend\src\guardians\guardians.controller.ts:48: @ApiOperation({ summary: 'Get guardian details' })
+D:\school-transport-saas\apps\backend\src\platform\schools\schools.controller.ts:41: @ApiOperation({ summary: 'Get school details' })
+D:\school-transport-saas\apps\backend\src\platform\schools\schools.controller.ts:47: @ApiOperation({ summary: 'Update school details' })
+D:\school-transport-saas\apps\backend\src\platform\schools\schools.service.ts:81: metadata: { planId: dto.planId }
+D:\school-transport-saas\apps\backend\src\platform\users\platform-users.controller.ts:52: @ApiOperation({ summary: 'Get platform user details' })
+D:\school-transport-saas\apps\backend\src\routes\routes.controller.ts:51: @ApiOperation({ summary: 'Get route details' })
+D:\school-transport-saas\apps\backend\src\school-settings\school-settings.controller.ts:17: @ApiOperation({ summary: 'Get school settings and details' })
+D:\school-transport-saas\apps\backend\src\students\students.controller.ts:52: @ApiOperation({ summary: 'Get student details' })
+D:\school-transport-saas\apps\backend\src\supervisors\supervisors.controller.ts:46: @ApiOperation({ summary: 'Get supervisor details' })
+D:\school-transport-saas\apps\backend\src\tracking\tracking.gateway.ts:21: export class TrackingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+D:\school-transport-saas\apps\backend\src\tracking\tracking.gateway.ts:25: private readonly logger = new Logger(TrackingGateway.name);
+D:\school-transport-saas\apps\backend\src\tracking\tracking.module.ts:3: import { TrackingGateway } from './tracking.gateway';
+D:\school-transport-saas\apps\backend\src\tracking\tracking.module.ts:9: providers: [TrackingGateway],
+D:\school-transport-saas\apps\backend\src\tracking\tracking.module.ts:11: export class TrackingModule {}
+D:\school-transport-saas\apps\backend\src\trips\trips.controller.ts:53: @ApiOperation({ summary: 'Get trip details and student roster' })
+D:\school-transport-saas\apps\backend\src\users\users.controller.ts:47: @ApiOperation({ summary: 'Get user details' })
+D:\school-transport-saas\apps\backend\tsconfig.json:10: "emitDecoratorMetadata": true,
+D:\school-transport-saas\apps\mobile\android\app\src\main\AndroidManifest.xml:19: <meta-data
+D:\school-transport-saas\apps\mobile\android\app\src\main\AndroidManifest.xml:28: <!-- Don't delete the meta-data below.
+D:\school-transport-saas\apps\mobile\android\app\src\main\AndroidManifest.xml:30: <meta-data
+D:\school-transport-saas\apps\mobile\android\app\src\main\AndroidManifest.xml:35: <meta-data
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:12: import '../../features/parent/parent_trip_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:13: import '../../features/parent/student_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:18: import '../../features/parent/address_request_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:26: import '../../features/supervisor/student_in_trip_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:30: import '../../features/supervisor/sync_operation_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:33: import '../../features/driver/driver_route_details_screen.dart';
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:73: final token = await SecureStorageService.getAccessToken();
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:116: builder: (ctx, state) => const ParentLiveMapScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:119: path: '/parent/trip-details',
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:120: builder: (ctx, state) => const ParentTripDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:123: path: '/parent/student-details',
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:124: builder: (ctx, state) => const StudentDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:143: path: '/parent/address-request-details',
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:144: builder: (ctx, state) => const AddressRequestDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:178: builder: (ctx, state) => const StudentInTripDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:193: path: '/supervisor/sync-details',
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:194: builder: (ctx, state) => const SyncOperationDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:207: path: '/driver/route-details',
+D:\school-transport-saas\apps\mobile\lib\app\router\app_router.dart:208: builder: (ctx, state) => const DriverRouteDetailsScreen(),
+D:\school-transport-saas\apps\mobile\lib\core\network\api_client.dart:40: ? await SecureStorageService.getAccessToken()
+D:\school-transport-saas\apps\mobile\lib\core\storage\secure_storage_service.dart:42: static Future<String?> getAccessToken() async {
+D:\school-transport-saas\apps\mobile\lib\core\widgets\map_widgets.dart:129: final String eta;
+D:\school-transport-saas\apps\mobile\lib\core\widgets\map_widgets.dart:136: required this.eta,
+D:\school-transport-saas\apps\mobile\lib\core\widgets\map_widgets.dart:176: 'الوصول المتوقع: $eta',
+D:\school-transport-saas\apps\mobile\lib\features\driver\driver_home_screen.dart:160: onPressed: () => context.push('/driver/route-details'),
+D:\school-transport-saas\apps\mobile\lib\features\driver\driver_route_details_screen.dart:7: class DriverRouteDetailsScreen extends StatelessWidget {
+D:\school-transport-saas\apps\mobile\lib\features\driver\driver_route_details_screen.dart:8: const DriverRouteDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\parent\address_requests_list_screen.dart:92: context.push('/parent/address-request-details'),
+D:\school-transport-saas\apps\mobile\lib\features\parent\address_request_details_screen.dart:10: class AddressRequestDetailsScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\parent\address_request_details_screen.dart:11: const AddressRequestDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_home_screen.dart:143: onTap: () => context.push('/parent/student-details'),
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_home_screen.dart:290: onPressed: () => context.go('/parent/trip-details'),
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_home_screen.dart:313: onTap: () => context.push('/parent/student-details'),
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_live_map_screen.dart:12: class ParentLiveMapScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_live_map_screen.dart:13: const ParentLiveMapScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_live_map_screen.dart:100: // Bottom Route Details Card
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_trip_details_screen.dart:10: class ParentTripDetailsScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_trip_details_screen.dart:11: const ParentTripDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\parent\parent_trip_details_screen.dart:107: value: trip.estimatedArrival,
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_details_screen.dart:13: class StudentDetailsScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_details_screen.dart:14: const StudentDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_details_screen.dart:56: // Detailed Specs Card
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:68: details:
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:78: details:
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:88: details: 'تم تقديم طلب غياب مسبق وتم إخطار المشرفة بنجاح',
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:105: final String details;
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:113: required this.details,
+D:\school-transport-saas\apps\mobile\lib\features\parent\student_trip_history_screen.dart:147: Text(details, style: AppTypography.bodyMedium),
+D:\school-transport-saas\apps\mobile\lib\features\shared\general_search_screen.dart:72: context.push('/parent/student-details'),
+D:\school-transport-saas\apps\mobile\lib\features\supervisor\student_in_trip_details_screen.dart:13: class StudentInTripDetailsScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\supervisor\student_in_trip_details_screen.dart:14: const StudentInTripDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\features\supervisor\sync_log_list_screen.dart:94: onTap: () => context.push('/supervisor/sync-details'),
+D:\school-transport-saas\apps\mobile\lib\features\supervisor\sync_operation_details_screen.dart:11: class SyncOperationDetailsScreen extends ConsumerWidget {
+D:\school-transport-saas\apps\mobile\lib\features\supervisor\sync_operation_details_screen.dart:12: const SyncOperationDetailsScreen({super.key});
+D:\school-transport-saas\apps\mobile\lib\mock\mock_repository.dart:97: estimatedArrival: '07:30 ص',
+D:\school-transport-saas\apps\mobile\lib\mock\models\models.dart:145: final String estimatedArrival;
+D:\school-transport-saas\apps\mobile\lib\mock\models\models.dart:160: required this.estimatedArrival,
+D:\school-transport-saas\apps\mobile\lib\mock\models\models.dart:176: String? estimatedArrival,
+D:\school-transport-saas\apps\mobile\lib\mock\models\models.dart:191: estimatedArrival: estimatedArrival ?? this.estimatedArrival,
+D:\school-transport-saas\apps\mobile\pubspec.yaml:82: # For details regarding adding assets from package dependencies, see
+D:\school-transport-saas\apps\mobile\pubspec.yaml:102: # For details regarding fonts from package dependencies,
+D:\school-transport-saas\apps\platform-admin\package-lock.json:71: "integrity": "sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:87: "gensync": "^1.0.0-beta.2",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:599: "integrity": "sha512-1IOd5xfVhlGwX+zXv2N93k0yMONvUlANylbJw1eTah8K/Jtpi15KC+WSiaX/nBmbm2HxRM1gZ0nSdjSsrZbGKg==",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:1273: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:2066: "integrity": "sha512-BpcOjWCJub6nRZUS2zA20pmLvjtqAtGejETaIyRLiZiQf++cbrjltLA5NN/xaXfqeOBOSlMFbemIl5/S5tljmg==",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:2192: "integrity": "sha512-iOwlRo9vnp6R6ohHQS11n0NnfdXx/omhkocmIfaPRpQhKZ+3BDMkkdRVh53qjkFkpPddf+FETA28NwGN7l5l+w==",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:3056: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:3464: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:3491: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:3558: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:3579: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:4018: "version": "1.0.0-beta.2",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:4019: "resolved": "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz",
+D:\school-transport-saas\apps\platform-admin\package-lock.json:5421: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:5877: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:6518: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\package-lock.json:6619: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\platform-admin\README.md:36: Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\audit\[id]\page.tsx:11: export default function AuditLogDetailsPage() {
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\audit\[id]\page.tsx:47: <span className="text-[#13233A] leading-relaxed">{log.details}</span>
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\invoices\[id]\page.tsx:11: export default function InvoiceDetailsPage() {
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\invoices\[id]\page.tsx:46: {/* Invoice Target Details */}
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\schools\[id]\page.tsx:12: export default function SchoolDetailsPage() {
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\subscriptions\[id]\page.tsx:11: export default function SubscriptionDetailsPage() {
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\support\[id]\page.tsx:10: export default function SupportTicketDetailsPage() {
+D:\school-transport-saas\apps\platform-admin\src\app\(dashboard)\system-health\errors\page.tsx:27: service: "Socket.IO Live Tracking Gateway",
+D:\school-transport-saas\apps\platform-admin\src\app\layout.tsx:1: import type { Metadata } from "next";
+D:\school-transport-saas\apps\platform-admin\src\app\layout.tsx:4: export const metadata: Metadata = {
+D:\school-transport-saas\apps\platform-admin\src\components\layout\sidebar.tsx:68: <span className="font-bold text-sm tracking-wide">مالك المنصة SaaS</span>
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:10: details?: any;
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:12: meta?: {
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:47: details?: any;
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:49: constructor(message: string, code: number = 500, details?: any) {
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:53: this.details = details;
+D:\school-transport-saas\apps\platform-admin\src\lib\api.ts:144: json.error?.details,
+D:\school-transport-saas\apps\platform-admin\src\mock\mockData.ts:70: details: string;
+D:\school-transport-saas\apps\platform-admin\src\mock\mockData.ts:200: key: "live_gps_tracking",
+D:\school-transport-saas\apps\platform-admin\src\mock\mockData.ts:224: details: "زيادة السعة القصوى للحافلات من 15 إلى 20 حافلة.",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:71: "integrity": "sha512-RgHBCvtjbOK2gXSNBNIkNoEc9qoVEtau3hj8gEqKQuL3HZAibKarWFEI3Lfm6EYKkLalOh8eSrj9b+ch9H/VBA==",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:87: "gensync": "^1.0.0-beta.2",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:599: "integrity": "sha512-1IOd5xfVhlGwX+zXv2N93k0yMONvUlANylbJw1eTah8K/Jtpi15KC+WSiaX/nBmbm2HxRM1gZ0nSdjSsrZbGKg==",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:1273: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:2066: "integrity": "sha512-BpcOjWCJub6nRZUS2zA20pmLvjtqAtGejETaIyRLiZiQf++cbrjltLA5NN/xaXfqeOBOSlMFbemIl5/S5tljmg==",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:2192: "integrity": "sha512-iOwlRo9vnp6R6ohHQS11n0NnfdXx/omhkocmIfaPRpQhKZ+3BDMkkdRVh53qjkFkpPddf+FETA28NwGN7l5l+w==",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:3056: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:3464: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:3491: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:3558: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:3579: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:4018: "version": "1.0.0-beta.2",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:4019: "resolved": "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz",
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:5421: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:5877: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:6518: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\package-lock.json:6619: "peerDependenciesMeta": {
+D:\school-transport-saas\apps\school-dashboard\README.md:36: Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+D:\school-transport-saas\apps\school-dashboard\src\app\(auth)\login\page.tsx:48: <h1 className="text-xl font-bold text-[#13233A] tracking-tight">منصة إدارة النقل المدرسي</h1>
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\absence-requests\[id]\page.tsx:11: export default function AbsenceRequestDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\buses\[id]\assign\page.tsx:17: const [assignedList, setAssignedList] = useState<Student[]>(
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\buses\[id]\assign\page.tsx:47: setAssignedList((prev) => [...prev, { ...student, busNumber: bus.number }]);
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\buses\[id]\assign\page.tsx:51: setAssignedList((prev) => prev.filter((s) => s.id !== student.id));
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\buses\[id]\page.tsx:12: export default function BusDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\drivers\[id]\page.tsx:10: export default function DriverDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\guardians\[id]\page.tsx:12: export default function GuardianDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\reports\trips\page.tsx:11: export default function TripsDetailedReportPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\routes\[id]\assign\page.tsx:17: const [assignedList, setAssignedList] = useState<Student[]>(
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\routes\[id]\page.tsx:13: export default function RouteDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\settings\features\page.tsx:12: { key: "live_tracking", nameAr: "تتبع الحافلات المباشر عبر الـ GPS", isEnabled: true },
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\settings\page.tsx:20: const [address, setAddress] = useState("حي النرجس، الرياض");
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\settings\page.tsx:32: setAddress(data.schoolInfo.address || address);
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\settings\page.tsx:128: onChange={(e) => setAddress(e.target.value)}
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:23: export default function StudentDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:26: const [activeTab, setActiveTab] = useState<"overview" | "guardian" | "bus">("overview");
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:95: onClick={() => setActiveTab("overview")}
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:97: activeTab === "overview" ? "bg-[#1769E0] text-white" : "text-[#66758A] hover:bg-[#F5F8FC]"
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:103: onClick={() => setActiveTab("guardian")}
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:105: activeTab === "guardian" ? "bg-[#1769E0] text-white" : "text-[#66758A] hover:bg-[#F5F8FC]"
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:112: {/* Tab 1: Overview & Transport Details */}
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:113: {activeTab === "overview" && (
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:160: {/* Tab 2: Guardian Details */}
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\students\[id]\page.tsx:161: {activeTab === "guardian" && (
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\supervisors\[id]\page.tsx:10: export default function SupervisorDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\(dashboard)\trips\[id]\page.tsx:12: export default function TripDetailsPage() {
+D:\school-transport-saas\apps\school-dashboard\src\app\layout.tsx:1: import type { Metadata } from "next";
+D:\school-transport-saas\apps\school-dashboard\src\app\layout.tsx:4: export const metadata: Metadata = {
+D:\school-transport-saas\apps\school-dashboard\src\components\ui\map-setup.tsx:73: title="Google Maps Fleet Tracking"
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:10: details?: any;
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:12: meta?: {
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:51: details?: any;
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:53: constructor(message: string, code: number = 500, details?: any) {
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:57: this.details = details;
+D:\school-transport-saas\apps\school-dashboard\src\lib\api.ts:154: json.error?.details,
+D:\school-transport-saas\apps\school-dashboard\src\mock\mockData.ts:33: gpsStatus: "متصل" | "انقطاع المؤشر" | "غير متصل";
+D:\school-transport-saas\apps\school-dashboard\src\mock\mockData.ts:237: gpsStatus: "متصل",
+D:\school-transport-saas\apps\school-dashboard\src\mock\mockData.ts:253: gpsStatus: "متصل",
+D:\school-transport-saas\apps\school-dashboard\src\mock\mockData.ts:269: gpsStatus: "انقطاع المؤشر",
