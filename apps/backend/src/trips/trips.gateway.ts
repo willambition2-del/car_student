@@ -82,9 +82,7 @@ export class TripsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     
     if (user.role === 'SCHOOL_ADMIN' || user.role === 'TRANSPORT_MANAGER') {
       isAuthorized = true;
-    } else if (user.role === 'DRIVER') {
-      const driver = await this.prisma.driver.findFirst({ where: { schoolUserId: user.sub, schoolId: user.schoolId } });
-      if (driver && trip.driverId === driver.id) isAuthorized = true;
+
     } else if (user.role === 'SUPERVISOR') {
       const supervisor = await this.prisma.supervisor.findFirst({ where: { schoolUserId: user.sub, schoolId: user.schoolId } });
       if (supervisor && trip.supervisorId === supervisor.id) isAuthorized = true;

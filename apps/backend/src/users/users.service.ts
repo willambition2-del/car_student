@@ -188,7 +188,7 @@ export class UsersService {
       TRANSPORT_MANAGER: { description: 'مدير النقل', defaultPermissions: ['MANAGE_ROUTES', 'MANAGE_BUSES'] },
       ACCOUNTANT: { description: 'محاسب', defaultPermissions: ['MANAGE_FINANCE'] },
       SUPERVISOR: { description: 'مشرف/ة', defaultPermissions: ['VIEW_TRIPS'] },
-      DRIVER: { description: 'سائق', defaultPermissions: ['VIEW_TRIPS'] },
+
       PARENT: { description: 'ولي أمر', defaultPermissions: ['VIEW_STUDENT_TRIPS'] },
       DATA_ENTRY: { description: 'مدخل بيانات', defaultPermissions: ['MANAGE_STUDENTS'] },
     };

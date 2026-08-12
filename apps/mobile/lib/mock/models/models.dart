@@ -1,8 +1,10 @@
 enum UserRole {
   parent('ولي الأمر', 'parent'),
   supervisor('مشرفة الباص', 'supervisor'),
-  driver('السائق', 'driver'),
-  transportManager('مسؤول النقل', 'transport_manager');
+  transportManager('مسؤول النقل', 'transport_manager'),
+  accountant('المحاسب', 'accountant'),
+  schoolAdmin('إدارة المدرسة', 'school_admin'),
+  platformAdmin('مدير المنصة', 'platform_admin');
 
   final String label;
   final String code;

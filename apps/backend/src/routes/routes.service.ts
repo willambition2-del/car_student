@@ -56,7 +56,7 @@ export class RoutesService {
         nameAr: route.nameAr,
         nameEn: route.nameEn,
         busNumber: route.bus?.busNumber || 'غير موزع',
-        driverName: route.bus?.driver?.schoolUser?.fullName || 'غير معين',
+        driverName: route.bus?.driver?.fullName || route.bus?.driver?.schoolUser?.fullName || 'غير معين',
         supervisorName:
           route.bus?.supervisor?.schoolUser?.fullName || 'غير معينة',
         tripType: route.tripType === 'MORNING' ? 'صباحي' : 'عودة',

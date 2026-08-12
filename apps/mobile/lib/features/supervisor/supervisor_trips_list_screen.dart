@@ -10,36 +10,30 @@ class SupervisorTripsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref.watch(activeTripProvider).when(
-      data: (trip) {
-        
-    
-
-    return AppScaffold(
-      title: 'جدول الرحلات المكلفة بها',
-      subtitle: 'قائمة الرحلات الصباحية والمسائية اليومية',
-      body: ListView(
-        children: [
-          TripCard(
-            trip: trip,
-            onTap: () => context.push('/supervisor/trip/active'),
-          ),
-          const SizedBox(height: 10),
-          TripCard(
-            trip: MockData.activeTrip.copyWith(
-              id: 'trip_102',
-              tripType: 'رحلة العودة',
-              startTime: '01:30 م',
-              boardedCount: 0,
-            ),
-            onTap: () => context.push('/supervisor/trip/active'),
-          ),
-        ],
-      ),
-    );
-  
-      },
+    return ref.watch(scheduledTripsProvider).when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, stack) => Scaffold(body: Center(child: Text("Error: \$error"))),
-    );}
+      error: (err, stack) => Scaffold(body: Center(child: Text("خطأ: $err"))),
+      data: (trips) {
+        return AppScaffold(
+          title: 'جدول الرحلات المكلفة بها',
+          subtitle: 'قائمة الرحلات الصباحية والمسائية اليومية',
+          body: trips.isEmpty
+              ? const Center(child: Text('لا توجد رحلات مجدولة'))
+              : ListView.builder(
+                  itemCount: trips.length,
+                  itemBuilder: (context, index) {
+                    final trip = trips[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: TripCard(
+                        trip: trip,
+                        onTap: () => context.push('/supervisor/trip/active'),
+                      ),
+                    );
+                  },
+                ),
+        );
+      },
+    );
+  }
 }

@@ -14,6 +14,10 @@ class RoleBottomNavigation extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(selectedRoleProvider);
 
+    if (role == null) {
+      return const SizedBox.shrink();
+    }
+
     List<_NavItem> items = [];
     switch (role) {
       case UserRole.parent:
@@ -72,34 +76,7 @@ class RoleBottomNavigation extends ConsumerWidget {
           ),
         ];
         break;
-      case UserRole.driver:
-        items = [
-          _NavItem(
-            label: 'الرئيسية',
-            icon: Icons.home_outlined,
-            activeIcon: Icons.home_rounded,
-            route: '/driver/home',
-          ),
-          _NavItem(
-            label: 'الرحلة',
-            icon: Icons.navigation_outlined,
-            activeIcon: Icons.navigation_rounded,
-            route: '/driver/trip/active',
-          ),
-          _NavItem(
-            label: 'البلاغات',
-            icon: Icons.report_problem_outlined,
-            activeIcon: Icons.report_problem_rounded,
-            route: '/driver/reports',
-          ),
-          _NavItem(
-            label: 'الحساب',
-            icon: Icons.person_outline_rounded,
-            activeIcon: Icons.person_rounded,
-            route: '/shared/profile',
-          ),
-        ];
-        break;
+
       case UserRole.transportManager:
         items = [
           _NavItem(
@@ -127,8 +104,12 @@ class RoleBottomNavigation extends ConsumerWidget {
             route: '/shared/profile',
           ),
         ];
+      default:
+        items = [];
         break;
     }
+
+    if (items.isEmpty) return const SizedBox.shrink();
 
     int currentIndex = items.indexWhere(
       (item) => currentRoute.startsWith(item.route),

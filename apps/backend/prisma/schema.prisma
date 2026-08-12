@@ -879,7 +879,8 @@ model Bus {
 model Driver {
   id             String   @id @default(cuid())
   schoolId       String
-  schoolUserId   String   @unique
+  schoolUserId   String?  @unique
+  fullName       String?
   licenseNumber  String?
   licenseExpiry  DateTime?
   nationalId     String?
@@ -893,7 +894,7 @@ model Driver {
   deletedAt      DateTime?
 
   school         School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolUser     SchoolUser @relation(fields: [schoolUserId], references: [id])
+  schoolUser     SchoolUser? @relation(fields: [schoolUserId], references: [id])
   buses          Bus[]
   trips          Trip[]
 

@@ -16,6 +16,7 @@ class SharedProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(selectedRoleProvider);
+    final roleLabel = role?.label ?? 'غير محدد';
 
     return AppScaffold(
       title: 'الإعدادات والملف الشخصي',
@@ -55,7 +56,7 @@ class SharedProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'حساب الموظف (${role.label})',
+                          'حساب الموظف ($roleLabel)',
                           style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
                         ),
                         const SizedBox(height: 2),

@@ -8,6 +8,7 @@ import '../../core/widgets/bottom_navigation.dart';
 import '../../core/widgets/state_widgets.dart';
 import '../../core/widgets/sync_operation_card.dart';
 import '../../mock/mock_repository.dart';
+import '../../core/sync/sync_service.dart';
 import '../../mock/models/models.dart';
 
 class SyncLogListScreen extends ConsumerWidget {
@@ -32,29 +33,22 @@ class SyncLogListScreen extends ConsumerWidget {
         children: [
           SyncStatusBanner(
             pendingCount: pendingOpsCount,
-            onSyncPressed: () {
-              final updated = ops
-                  .map(
-                    (o) => SyncOperationModel(
-                      id: o.id,
-                      studentName: o.studentName,
-                      tripId: o.tripId,
-                      actionType: o.actionType,
-                      previousState: o.previousState,
-                      newState: o.newState,
-                      timestamp: o.timestamp,
-                      status: 'تمت المزامنة',
-                      retryCount: o.retryCount,
-                    ),
-                  )
-                  .toList();
-
-              // ref.read(syncOperationsProvider.notifier).state = updated;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تمت مزامنة جميع العمليات بنجاح!'),
-                ),
-              );
+            onSyncPressed: () async {
+              try {
+                await ref.read(syncServiceProvider).processQueue();
+                ref.invalidate(syncOperationsProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('تمت عملية المزامنة بنجاح!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('فشل أثناء المزامنة: $e')),
+                  );
+                }
+              }
             },
           ),
           const SizedBox(height: 12),
@@ -70,23 +64,17 @@ class SyncLogListScreen extends ConsumerWidget {
                 SecondaryButton(
                   text: 'مزامنة الكل الآن',
                   height: 36,
-                  onPressed: () {
-                    final updated = ops
-                        .map(
-                          (o) => SyncOperationModel(
-                            id: o.id,
-                            studentName: o.studentName,
-                            tripId: o.tripId,
-                            actionType: o.actionType,
-                            previousState: o.previousState,
-                            newState: o.newState,
-                            timestamp: o.timestamp,
-                            status: 'تمت المزامنة',
-                            retryCount: o.retryCount,
-                          ),
-                        )
-                        .toList();
-                    // ref.read(syncOperationsProvider.notifier).state = updated;
+                  onPressed: () async {
+                    try {
+                      await ref.read(syncServiceProvider).processQueue();
+                      ref.invalidate(syncOperationsProvider);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('فشل المزامنة: $e')),
+                        );
+                      }
+                    }
                   },
                 ),
             ],

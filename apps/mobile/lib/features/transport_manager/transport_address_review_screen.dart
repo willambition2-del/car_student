@@ -10,6 +10,7 @@ import '../../core/widgets/app_text_fields.dart';
 import '../../core/widgets/information_row.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../mock/mock_repository.dart';
+import '../../features/transport_manager/services/requests_service.dart';
 
 class TransportAddressReviewScreen extends ConsumerStatefulWidget {
   const TransportAddressReviewScreen({super.key});
@@ -34,20 +35,73 @@ class _TransportAddressReviewScreenState
     super.dispose();
   }
 
-  void _handleApprove() async {
+  void _handleApprove(String id) async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 600));
-    if (mounted) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'تم قبول طلب تغيير العنوان وتحديث خط سير الحافلة بنجاح!',
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
+    try {
+      await ref.read(requestsServiceProvider).resolveAddressRequest(
+        id, 
+        true, 
+        notes: _notesController.text
       );
-      context.pop();
+      ref.invalidate(addressRequestsProvider);
+      
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'تم قبول طلب تغيير العنوان وتحديث خط سير الحافلة بنجاح!',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('فشل الموافقة على الطلب: $e'),
+            backgroundColor: AppColors.errorRed,
+          ),
+        );
+      }
+    }
+  }
+
+  void _handleReject(String id) async {
+    setState(() => _isLoading = true);
+    try {
+      await ref.read(requestsServiceProvider).resolveAddressRequest(
+        id, 
+        false, 
+        notes: _notesController.text
+      );
+      ref.invalidate(addressRequestsProvider);
+      
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'تم رفض طلب العنوان وإبلاع ولي الأمر',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('فشل رفض الطلب: $e'),
+            backgroundColor: AppColors.errorRed,
+          ),
+        );
+      }
     }
   }
 
@@ -163,16 +217,7 @@ class _TransportAddressReviewScreenState
                     child: DangerButton(
                       text: 'رفض الطلب',
                       height: 44,
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'تم رفض طلب العنوان وإبلاع ولي الأمر',
-                            ),
-                          ),
-                        );
-                        context.pop();
-                      },
+                      onPressed: () => _handleReject(req.id),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -181,7 +226,7 @@ class _TransportAddressReviewScreenState
                       text: 'موافقة وتحديث المسار',
                       height: 44,
                       isLoading: _isLoading,
-                      onPressed: _handleApprove,
+                      onPressed: () => _handleApprove(req.id),
                     ),
                   ),
                 ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import 'app_top_bar.dart';
-import 'role_switcher_card.dart';
 
 class AppScaffold extends StatelessWidget {
   final String? title;
@@ -12,7 +11,6 @@ class AppScaffold extends StatelessWidget {
   final List<Widget>? actions;
   final Widget? bottomNavigationBar;
   final Widget? floatingActionButton;
-  final bool showRoleSwitcher;
   final EdgeInsetsGeometry? padding;
   final PreferredSizeWidget? customAppBar;
 
@@ -26,7 +24,6 @@ class AppScaffold extends StatelessWidget {
     this.actions,
     this.bottomNavigationBar,
     this.floatingActionButton,
-    this.showRoleSwitcher = true,
     this.padding,
     this.customAppBar,
   });
@@ -48,16 +45,9 @@ class AppScaffold extends StatelessWidget {
                   )
                 : null),
         body: SafeArea(
-          child: Column(
-            children: [
-              if (showRoleSwitcher) const RoleSwitcherCard(),
-              Expanded(
-                child: Padding(
-                  padding: padding ?? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  child: body,
-                ),
-              ),
-            ],
+          child: Padding(
+            padding: padding ?? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            child: body,
           ),
         ),
         bottomNavigationBar: bottomNavigationBar,

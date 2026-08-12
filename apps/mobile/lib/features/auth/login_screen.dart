@@ -22,8 +22,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'parent1@example.com');
-  final _passwordController = TextEditingController(text: 'Parent@2026!Dev');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _rememberMe = true;
   bool _isLoading = false;
@@ -67,9 +67,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         } else if (userRole == 'SUPERVISOR') {
           ref.read(selectedRoleProvider.notifier).state = UserRole.supervisor;
           context.go('/supervisor/home');
-        } else if (userRole == 'DRIVER') {
-          ref.read(selectedRoleProvider.notifier).state = UserRole.driver;
-          context.go('/driver/home');
+
         } else if (userRole == 'SCHOOL_ADMIN' ||
             userRole == 'TRANSPORT_MANAGER' ||
             userRole == 'SCHOOL_OWNER') {
@@ -97,7 +95,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       showBackButton: false,
-      showRoleSwitcher: true,
       body: Center(
         child: SingleChildScrollView(
           child: Container(
@@ -129,42 +126,131 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
-                  const SizedBox(height: 10),
-
+                  Text(
+                    'تسجيل الدخول',
+                    style: AppTypography.headlineLarge.copyWith(
+                      color: AppColors.primaryNavy,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'مرحباً بك في نظام النقل المدرسي',
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: AppColors.secondaryText,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  if (_errorMessage != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorRed.withOpacity(0.1),
+                        borderRadius: AppRadius.borderSm,
+                        border: Border.all(color: AppColors.errorRed, width: 1),
+                      ),
+                      child: Text(
+                        _errorMessage!,
+                        style: AppTypography.bodyMedium.copyWith(
+                          color: AppColors.errorRed,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  AppTextField(
+                    controller: _emailController,
+                    label: 'البريد الإلكتروني / رقم الهوية',
+                    hintText: 'أدخل بريدك الإلكتروني أو رقم الهوية',
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: Icons.email_outlined,
+                    validator: (val) {
+                      if (val == null || val.trim().isEmpty) {
+                        return 'يرجى إدخال البريد الإلكتروني';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  AppTextField(
+                    controller: _passwordController,
+                    label: 'كلمة المرور',
+                    hintText: 'أدخل كلمة المرور الخاصة بك',
+                    obscureText: true,
+                    prefixIcon: Icons.lock_outline_rounded,
+                    validator: (val) {
+                      if (val == null || val.isEmpty) {
+                        return 'يرجى إدخال كلمة المرور';
+                      }
+                      if (val.length < 6) {
+                        return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: Checkbox(
+                              value: _rememberMe,
+                              onChanged: (val) {
+                                setState(() {
+                                  _rememberMe = val ?? true;
+                                });
+                              },
+                              activeColor: AppColors.primaryNavy,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'تذكرني',
+                            style: AppTypography.bodyMedium,
+                          ),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () => context.push('/auth/forgot-password'),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 0),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'نسيت كلمة المرور؟',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.primaryNavy,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : PrimaryButton(
+                          text: 'تسجيل الدخول',
+                          onPressed: _handleLogin,
+                        ),
                                   ],
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DemoRoleChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _DemoRoleChip({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(icon, size: 16, color: AppColors.primaryNavy),
-      label: Text(label),
-      labelStyle: AppTypography.caption.copyWith(
-        color: AppColors.primaryNavy,
-        fontWeight: FontWeight.w700,
-      ),
-      backgroundColor: AppColors.primarySoft,
-      side: const BorderSide(color: AppColors.primaryBorder, width: 1),
-      onPressed: onTap,
     );
   }
 }

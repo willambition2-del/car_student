@@ -21,7 +21,6 @@ import { EmergencyService } from './emergency.service';
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.TRANSPORT_MANAGER,
   SchoolRoleEnum.SUPERVISOR,
-  SchoolRoleEnum.DRIVER,
 )
 @Controller('school/emergency')
 export class EmergencyController {

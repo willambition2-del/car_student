@@ -70,7 +70,7 @@ export class TripsService {
           routeName: trip.route?.nameAr || 'مسار النقل الميداني',
           busNumber: trip.bus?.busNumber || 'غير محدد',
           busPlate: trip.bus?.plateNumber || 'غير محدد',
-          driverName: trip.driver?.schoolUser?.fullName || 'سائق التجربة',
+          driverName: trip.driver?.fullName || trip.driver?.schoolUser?.fullName || 'غير مرتبط',
           supervisorName:
             trip.supervisor?.schoolUser?.fullName || 'مشرفة التجربة',
           tripType: trip.tripType === 'MORNING' ? 'صباحي' : 'عودة',

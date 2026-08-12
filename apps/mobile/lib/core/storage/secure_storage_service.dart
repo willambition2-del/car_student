@@ -11,6 +11,7 @@ class SecureStorageService {
   static const String _keyUserFullName = 'user_fullname';
   static const String _keySchoolId = 'school_id';
   static const String _keyMustChangePassword = 'must_change_password';
+  static const String _keyHasSeenOnboarding = 'has_seen_onboarding';
 
   static Future<void> saveAuthData({
     required String accessToken,
@@ -87,5 +88,14 @@ class SecureStorageService {
     await _storage.delete(key: _keyUserFullName);
     await _storage.delete(key: _keySchoolId);
     await _storage.delete(key: _keyMustChangePassword);
+  }
+
+  static Future<void> setHasSeenOnboarding(bool value) async {
+    await _storage.write(key: _keyHasSeenOnboarding, value: value.toString());
+  }
+
+  static Future<bool> hasSeenOnboarding() async {
+    final val = await _storage.read(key: _keyHasSeenOnboarding);
+    return val == 'true';
   }
 }

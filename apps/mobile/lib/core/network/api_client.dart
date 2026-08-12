@@ -6,9 +6,12 @@ class ApiClient {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: kIsWeb
-        ? 'http://localhost:3000/api/v1'
-        : 'http://10.0.2.2:3000/api/v1', // Android emulator default
+        ? 'http://2.24.141.70:3210/api/v1'
+        : 'http://2.24.141.70:3210/api/v1', // Staging server default
   );
+
+  static const bool allowInsecureHttp =
+      bool.fromEnvironment('ALLOW_INSECURE_HTTP', defaultValue: false);
 
   late final Dio dio;
   late final Dio _refreshDio;
@@ -16,7 +19,7 @@ class ApiClient {
 
   ApiClient() {
     final apiUri = Uri.parse(baseUrl);
-    if (kReleaseMode && apiUri.scheme != 'https') {
+    if (kReleaseMode && apiUri.scheme != 'https' && !allowInsecureHttp) {
       throw StateError('API_BASE_URL must use HTTPS in release builds');
     }
 

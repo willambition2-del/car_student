@@ -49,7 +49,7 @@ export class BusesService {
         capacity: bus.capacity,
         model: bus.model || 'مرسيدس سبرينتر',
         year: bus.year || 2024,
-        driverName: bus.driver?.schoolUser?.fullName || 'غير معين',
+        driverName: bus.driver?.fullName || bus.driver?.schoolUser?.fullName || 'غير محدد',
         driverPhone:
           bus.driver?.phone || bus.driver?.schoolUser?.phone || 'غير مدخل',
         supervisorName: bus.supervisor?.schoolUser?.fullName || 'غير معينة',

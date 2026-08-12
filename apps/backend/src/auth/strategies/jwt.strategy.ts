@@ -56,6 +56,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         throw new UnauthorizedException('المستخدم غير موجود أو غير مفعل');
       }
 
+      if (user.role === 'DRIVER') {
+        throw new ForbiddenException('تسجيل دخول السائق غير متاح');
+      }
+
       const schoolStatus = user.school.status;
       if (
         schoolStatus === 'SUSPENDED' ||

@@ -9,6 +9,7 @@ import '../../core/constants/app_constants.dart';
 import '../../core/storage/secure_storage_service.dart';
 import '../../mock/mock_repository.dart';
 import '../../mock/models/models.dart';
+import '../../core/utils/role_route_mapper.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -39,21 +40,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     _controller.forward();
 
     _timer = Timer(const Duration(seconds: 2), () async {
-      final roleStr = await SecureStorageService.getUserRole();
-      if (roleStr != null) {
-        UserRole userRole = UserRole.parent;
-        if (roleStr == 'SUPERVISOR') {
-          userRole = UserRole.supervisor;
-        } else if (roleStr == 'DRIVER') {
-          userRole = UserRole.driver;
-        } else if (roleStr == 'TRANSPORT_MANAGER' || roleStr == 'SCHOOL_ADMIN' || roleStr == 'SCHOOL_OWNER') {
-          userRole = UserRole.transportManager;
+      try {
+        final roleStr = await SecureStorageService.getUserRole();
+        final hasSeenOnboarding = await SecureStorageService.hasSeenOnboarding();
+        if (roleStr != null) {
+          ref.read(selectedRoleProvider.notifier).state = RoleRouteMapper.getUserRoleEnum(roleStr);
         }
-        ref.read(selectedRoleProvider.notifier).state = userRole;
-      }
-      
-      if (mounted) {
-        context.go('/onboarding');
+        
+        if (mounted) {
+          if (hasSeenOnboarding || roleStr != null) {
+            context.go('/auth/login');
+          } else {
+            context.go('/onboarding');
+          }
+        }
+      } catch (e) {
+        // Fallback in case storage throws exception (e.g. corruption)
+        if (mounted) {
+          context.go('/auth/login');
+        }
       }
     });
   }

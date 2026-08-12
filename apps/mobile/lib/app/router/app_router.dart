@@ -29,10 +29,7 @@ import '../../features/supervisor/school_arrival_screen.dart';
 import '../../features/supervisor/supervisor_end_trip_screen.dart';
 import '../../features/supervisor/sync_log_list_screen.dart';
 import '../../features/supervisor/sync_operation_details_screen.dart';
-import '../../features/driver/driver_home_screen.dart';
-import '../../features/driver/driver_active_trip_screen.dart';
-import '../../features/driver/driver_route_details_screen.dart';
-import '../../features/driver/driver_reports_screen.dart';
+
 import '../../features/transport_manager/transport_manager_home_screen.dart';
 import '../../features/transport_manager/transport_operations_center_screen.dart';
 import '../../features/transport_manager/transport_address_requests_screen.dart';
@@ -41,6 +38,9 @@ import '../../features/transport_manager/transport_alerts_screen.dart';
 import '../../features/profile/shared_profile_screen.dart';
 import '../../features/shared/general_search_screen.dart';
 import '../../features/shared/tech_support_screen.dart';
+
+import '../../features/shared/unsupported_role_screen.dart';
+import '../../core/utils/role_route_mapper.dart';
 
 const _publicPaths = <String>{
   '/splash',
@@ -52,19 +52,7 @@ const _publicPaths = <String>{
 };
 
 String _homeForRole(String? role) {
-  switch (role) {
-    case 'SUPERVISOR':
-      return '/supervisor/home';
-    case 'DRIVER':
-      return '/driver/home';
-    case 'SCHOOL_OWNER':
-    case 'SCHOOL_ADMIN':
-    case 'TRANSPORT_MANAGER':
-      return '/transport/home';
-    case 'PARENT':
-    default:
-      return '/parent/home';
-  }
+  return RoleRouteMapper.getRouteForRole(role);
 }
 
 final GoRouter appRouter = GoRouter(
@@ -215,23 +203,6 @@ final GoRouter appRouter = GoRouter(
       builder: (ctx, state) => const SyncOperationDetailsScreen(),
     ),
 
-    // Driver Routes
-    GoRoute(
-      path: '/driver/home',
-      builder: (ctx, state) => const DriverHomeScreen(),
-    ),
-    GoRoute(
-      path: '/driver/trip/active',
-      builder: (ctx, state) => const DriverActiveTripScreen(),
-    ),
-    GoRoute(
-      path: '/driver/route-details',
-      builder: (ctx, state) => const DriverRouteDetailsScreen(),
-    ),
-    GoRoute(
-      path: '/driver/reports',
-      builder: (ctx, state) => const DriverReportsScreen(),
-    ),
 
     // Transport Manager Routes
     GoRoute(
@@ -267,6 +238,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/shared/support',
       builder: (ctx, state) => const TechSupportScreen(),
+    ),
+    GoRoute(
+      path: '/unsupported-role',
+      builder: (ctx, state) => const UnsupportedRoleScreen(),
     ),
   ],
 );

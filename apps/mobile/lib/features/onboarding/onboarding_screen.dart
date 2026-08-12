@@ -4,6 +4,7 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_typography.dart';
 import '../../core/widgets/app_buttons.dart';
+import '../../core/storage/secure_storage_service.dart';
 
 class OnboardingItem {
   final String title;
@@ -49,19 +50,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ),
   ];
 
-  void _onNext() {
+  void _onNext() async {
     if (_currentIndex < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/auth/login');
+      await SecureStorageService.setHasSeenOnboarding(true);
+      if (mounted) context.go('/auth/login');
     }
   }
 
-  void _onSkip() {
-    context.go('/auth/login');
+  void _onSkip() async {
+    await SecureStorageService.setHasSeenOnboarding(true);
+    if (mounted) context.go('/auth/login');
   }
 
   @override

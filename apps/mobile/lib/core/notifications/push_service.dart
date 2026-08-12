@@ -52,7 +52,7 @@ class PushService {
     );
 
     await _localNotifications.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
@@ -80,17 +80,17 @@ class PushService {
   }
 
   void _onNewEndpoint(PushEndpoint endpoint, String instance) async {
-    print("Received new UnifiedPush endpoint: ${endpoint.endpoint}");
+    print("Received new UnifiedPush endpoint: ${endpoint.url}");
     
     // Save to local storage
-    await _storage.write(key: 'push_endpoint', value: endpoint.endpoint);
+    await _storage.write(key: 'push_endpoint', value: endpoint.url);
     
     // Send endpoint to the backend to register the device.
     try {
       final token = await _storage.read(key: 'auth_token');
       if (token != null) {
-        // Use 10.0.2.2 for Android emulator pointing to localhost
-        final url = Uri.parse('http://10.0.2.2:3000/api/v1/school/notifications/register-device');
+        final apiBaseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://2.24.141.70:3210/api/v1');
+        final url = Uri.parse('$apiBaseUrl/school/notifications/register-device');
         await http.post(
           url,
           headers: {
@@ -98,7 +98,7 @@ class PushService {
             'Authorization': 'Bearer $token',
           },
           body: jsonEncode({
-            'endpoint': endpoint.endpoint,
+            'endpoint': endpoint.url,
             'pushProvider': 'UNIFIED_PUSH',
             'platform': 'ANDROID',
           }),
@@ -118,14 +118,15 @@ class PushService {
   }
 
   void _onMessage(PushMessage message, String instance) {
-    print("UnifiedPush message received: ${message.message}");
+    final messageText = utf8.decode(message.content);
+    print("UnifiedPush message received: $messageText");
     try {
-      final payload = jsonDecode(message.message);
+      final payload = jsonDecode(messageText);
       _showLocalNotification(payload);
     } catch (e) {
       print("Failed to parse push message: $e");
       // If it's raw text, show it as a simple notification
-      _showLocalNotification({'title': 'إشعار جديد', 'message': message.message});
+      _showLocalNotification({'title': 'إشعار جديد', 'message': messageText});
     }
   }
 
@@ -149,10 +150,10 @@ class PushService {
     final platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await _localNotifications.show(
-      DateTime.now().millisecond, // Basic random ID
-      title,
-      body,
-      platformChannelSpecifics,
+      id: DateTime.now().millisecond, // Basic random ID
+      title: title,
+      body: body,
+      notificationDetails: platformChannelSpecifics,
       payload: jsonEncode(payload['data'] ?? {}),
     );
   }

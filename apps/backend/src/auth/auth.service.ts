@@ -100,7 +100,10 @@ export class AuthService {
           school: { status: { in: ['TRIAL', 'ACTIVE'] } },
         },
       });
-      if (user) return;
+      if (user) {
+        if (user.role === 'DRIVER') throw new ForbiddenException('تسجيل الدخول غير متاح للسائقين');
+        return;
+      }
     }
 
     throw new UnauthorizedException('Invalid refresh token');
@@ -115,6 +118,10 @@ export class AuthService {
 
     if (!user || user.deletedAt) {
       throw new UnauthorizedException('بيانات الدخول غير صحيحة');
+    }
+
+    if (user.role === 'DRIVER') {
+      throw new ForbiddenException('تسجيل دخول السائق غير متاح من خلال التطبيق');
     }
 
     // 2. Verify Password

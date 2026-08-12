@@ -62,8 +62,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           context.go('/parent/home');
         } else if (role == 'SUPERVISOR') {
           context.go('/supervisor/home');
-        } else if (role == 'DRIVER') {
-          context.go('/driver/home');
+
         } else if (role == 'SCHOOL_ADMIN' || role == 'TRANSPORT_MANAGER' || role == 'SCHOOL_OWNER') {
           context.go('/transport/home');
         } else {

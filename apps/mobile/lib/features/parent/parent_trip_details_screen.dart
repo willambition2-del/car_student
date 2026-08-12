@@ -15,6 +15,14 @@ class ParentTripDetailsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(activeTripProvider).when(
       data: (trip) {
+        if (trip == null) {
+          return AppScaffold(
+            title: 'تفاصيل الرحلة',
+            body: Center(
+              child: Text('لا توجد رحلة نشطة', style: AppTypography.titleLarge),
+            ),
+          );
+        }
         
     return ref.watch(studentsListProvider).when(
       data: (students) {

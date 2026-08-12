@@ -1,4 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/sync/sync_service.dart';
+import '../features/transport_manager/services/requests_service.dart';
+import '../features/supervisor/services/trip_service.dart';
+
 import '../core/network/api_client.dart';
 import 'models/models.dart';
 
@@ -230,7 +234,7 @@ class MockData {
 
 
 // State Providers for dynamic demo interactions
-final selectedRoleProvider = StateProvider<UserRole>((ref) => UserRole.parent);
+final selectedRoleProvider = StateProvider<UserRole?>((ref) => null);
 final selectedStudentIndexProvider = StateProvider<int>((ref) => 0);
 
 final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
@@ -249,75 +253,51 @@ final studentsListProvider = FutureProvider<List<StudentModel>>((ref) async {
   }
 });
 
-final activeTripProvider = FutureProvider<TripModel>((ref) async {
-  final api = ref.read(apiClientProvider);
-  try {
-    final response = await api.get('/trips/active');
-    final data = response['data'];
-    if (data != null) {
-      return TripModel.fromJson(data as Map<String, dynamic>);
-    }
-    return MockData.activeTrip;
-  } catch (e) {
-    return MockData.activeTrip;
-  }
+final activeTripProvider = FutureProvider<TripModel?>((ref) async {
+  final tripService = ref.read(tripServiceProvider);
+  return tripService.getActiveTrip();
 });
 
+final activeTripStudentsProvider = FutureProvider<List<StudentModel>>((ref) async {
+  final trip = await ref.watch(activeTripProvider.future);
+  if (trip == null) return [];
+  final tripService = ref.read(tripServiceProvider);
+  return tripService.getTripStudents(trip.id);
+});
+
+final scheduledTripsProvider = FutureProvider<List<TripModel>>((ref) async {
+  final tripService = ref.read(tripServiceProvider);
+  return tripService.getScheduledTrips();
+});
 final addressRequestsProvider = FutureProvider<List<AddressRequestModel>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  try {
-    final response = await api.get('/requests/address');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => AddressRequestModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return MockData.addressRequests;
-  } catch (e) {
-    return MockData.addressRequests;
-  }
+  final service = ref.read(requestsServiceProvider);
+  return service.getAddressRequests();
 });
 
 final absenceRequestsProvider = FutureProvider<List<AbsenceRequestModel>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  try {
-    final response = await api.get('/requests/absence');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => AbsenceRequestModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return MockData.absenceRequests;
-  } catch (e) {
-    return MockData.absenceRequests;
-  }
+  final service = ref.read(requestsServiceProvider);
+  return service.getAbsenceRequests();
 });
 
 final syncOperationsProvider = FutureProvider<List<SyncOperationModel>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  try {
-    final response = await api.get('/sync/operations');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => SyncOperationModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return MockData.syncOperations;
-  } catch (e) {
-    return MockData.syncOperations;
-  }
+  final service = ref.read(syncServiceProvider);
+  final queue = await service.getQueue();
+  
+  return queue.map((op) => SyncOperationModel(
+    id: op.id,
+    studentName: op.studentName,
+    tripId: op.tripId,
+    actionType: 'تحديث حالة',
+    previousState: '',
+    newState: op.status,
+    timestamp: op.timestamp.toString(),
+    status: op.syncStatus == 'PENDING' ? 'بانتظار الإرسال' : (op.syncStatus == 'FAILED' ? 'فشل الإرسال' : 'تمت المزامنة'),
+    retryCount: op.retryCount,
+    failureReason: op.failureReason,
+  )).toList();
 });
 
-final driverIncidentsProvider = FutureProvider<List<DriverIncidentModel>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  try {
-    final response = await api.get('/incidents/driver');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => DriverIncidentModel.fromJson(e as Map<String, dynamic>)).toList();
-    }
-    return MockData.driverIncidents;
-  } catch (e) {
-    return MockData.driverIncidents;
-  }
-});
+
 
 final supportTicketsProvider = FutureProvider<List<SupportTicketModel>>((ref) async {
   final api = ref.read(apiClientProvider);

@@ -22,9 +22,26 @@ class SupervisorHomeScreen extends ConsumerWidget {
         
     return ref.watch(activeTripProvider).when(
       data: (trip) {
+        if (trip == null) {
+          return AppScaffold(
+            title: 'لوحة المشرفة الميدانية',
+            showBackButton: false,
+            bottomNavigationBar: const RoleBottomNavigation(
+              currentRoute: '/supervisor/home',
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.directions_bus_outlined, size: 64, color: AppColors.border),
+                  const SizedBox(height: 16),
+                  Text('لا توجد رحلة نشطة حالياً', style: AppTypography.titleLarge),
+                ],
+              ),
+            ),
+          );
+        }
         
-    
-    
     final pendingOpsCount = syncOps
         .where((s) => s.status != 'تمت المزامنة')
         .length;

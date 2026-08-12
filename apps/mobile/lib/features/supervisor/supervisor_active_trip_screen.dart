@@ -11,6 +11,8 @@ import '../../core/widgets/bottom_navigation.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../core/widgets/student_widgets.dart';
 import '../../mock/mock_repository.dart';
+import '../../features/supervisor/services/trip_service.dart';
+import '../../core/sync/sync_service.dart';
 import '../../mock/models/models.dart';
 
 class SupervisorActiveTripScreen extends ConsumerStatefulWidget {
@@ -26,20 +28,41 @@ class _SupervisorActiveTripScreenState
   String _searchQuery = '';
   String _filterStatus = 'الكل';
 
-  void _updateStudentStatus(StudentModel student, StudentTripStatus newStatus) {
-    final currentStudents = ref.read(studentsListProvider).value;
-    if (currentStudents == null) return;
+  Future<void> _updateStudentStatus(StudentModel student, StudentTripStatus newStatus) async {
+    final trip = ref.read(activeTripProvider).value;
+    if (trip == null) return;
     
-    // In a real app we'd call the API here then refresh the provider.
-    // For now we simulate optimistic update if the provider supports it, 
-    // or just show the snackbar to simulate action.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('تم تسجيل: ${student.name} ← ${newStatus.label}'),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    try {
+      await ref.read(tripServiceProvider).updateStudentStatus(trip.id, student.id, newStatus);
+      ref.invalidate(activeTripStudentsProvider);
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('تم تسجيل: ${student.name} ← ${newStatus.label}'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      // Offline or failed, enqueue it!
+      await ref.read(syncServiceProvider).enqueueOperation(
+        tripId: trip.id,
+        studentId: student.id,
+        studentName: student.name,
+        status: newStatus.name.toUpperCase(),
+      );
+      ref.invalidate(syncOperationsProvider); // Refresh sync queue UI
+      
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل التحديث، تم الحفظ للمزامنة لاحقاً'),
+          backgroundColor: AppColors.errorRed,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _showDropoffSheet(StudentModel student) {
@@ -122,12 +145,23 @@ class _SupervisorActiveTripScreenState
   @override
   Widget build(BuildContext context) {
     final activeTripState = ref.watch(activeTripProvider);
-    final studentsState = ref.watch(studentsListProvider);
+    final studentsState = ref.watch(activeTripStudentsProvider);
 
     return activeTripState.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) => Scaffold(body: Center(child: Text("خطأ: $err"))),
       data: (trip) {
+        if (trip == null) {
+          return AppScaffold(
+            title: 'الرحلة الحالية',
+            bottomNavigationBar: const RoleBottomNavigation(
+              currentRoute: '/supervisor/trip/active',
+            ),
+            body: Center(
+              child: Text('لا توجد رحلة نشطة', style: AppTypography.titleLarge),
+            ),
+          );
+        }
         return studentsState.when(
           loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (err, stack) => Scaffold(body: Center(child: Text("خطأ: $err"))),

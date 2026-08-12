@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as argon2 from 'argon2';
+
 
 @Injectable()
 export class DriversService {
@@ -86,30 +86,11 @@ export class DriversService {
       nationalId?: string;
     },
   ) {
-    if (!data.password || data.password.length < 12) {
-      throw new BadRequestException(
-        'Driver initial password must contain at least 12 characters',
-      );
-    }
-    const passwordHash = await argon2.hash(data.password);
-
-    // 1. Create SchoolUser account for Driver app access
-    const user = await this.prisma.schoolUser.create({
-      data: {
-        schoolId,
-        fullName: data.fullName,
-        phone: data.phone,
-        email: data.email || `drv_${Date.now()}@school.local`,
-        passwordHash,
-        role: 'DRIVER',
-      },
-    });
-
-    // 2. Create Driver record linked to SchoolUser
+    // Create Driver record
     return this.prisma.driver.create({
       data: {
         schoolId,
-        schoolUserId: user.id,
+        fullName: data.fullName,
         phone: data.phone,
         licenseNumber: data.licenseNumber,
         nationalId: data.nationalId,
