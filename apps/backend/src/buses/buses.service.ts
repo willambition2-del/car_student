@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 
 @Injectable()
 export class BusesService {
@@ -130,18 +131,24 @@ export class BusesService {
       throw new BadRequestException('رقم الحافلة مستخدم بالفعل لهذه المدرسة');
     }
 
-    return this.prisma.bus.create({
-      data: {
-        schoolId,
-        busNumber: data.busNumber,
-        plateNumber: data.plateNumber,
-        capacity: data.capacity,
-        model: data.model,
-        year: data.year,
-        driverId: data.driverId,
-        supervisorId: data.supervisorId,
-        isActive: true,
-      },
+    // SaaS Limits Check with Concurrency Protection (Pessimistic Locking)
+    return this.prisma.$transaction(async (tx) => {
+      // Use Centralized Guard for School Status and Limits
+      await assertSchoolOperational(tx, schoolId, { checkMaxBuses: true });
+
+      return tx.bus.create({
+        data: {
+          schoolId,
+          busNumber: data.busNumber,
+          plateNumber: data.plateNumber,
+          capacity: data.capacity,
+          model: data.model,
+          year: data.year,
+          driverId: data.driverId,
+          supervisorId: data.supervisorId,
+          isActive: true,
+        },
+      });
     });
   }
 

@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CreditCard, ArrowRight, RefreshCw, Calendar, CheckCircle2 } from "lucide-react";
+import { platformSubscriptionsApi } from "@/lib/api";
 
 export default function SubscriptionDetailsPage() {
   const params = useParams();
@@ -19,11 +20,7 @@ export default function SubscriptionDetailsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/subscriptions/${params.id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
+    platformSubscriptionsApi.getSubscription(params.id as string)
       .then((data) => {
         setSub(data);
         setLoading(false);

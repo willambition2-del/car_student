@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Printer, ArrowRight, ShieldCheck, Receipt } from "lucide-react";
+import { platformInvoicesApi } from "@/lib/api";
 
 export default function InvoiceDetailsPage() {
   const params = useParams();
@@ -17,11 +18,7 @@ export default function InvoiceDetailsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/invoices/${params.id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
+    platformInvoicesApi.getInvoice(params.id as string)
       .then((data) => {
         setInv(data);
         setLoading(false);

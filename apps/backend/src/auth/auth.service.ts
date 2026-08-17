@@ -169,16 +169,37 @@ export class AuthService {
       enabledFeatures = overrides.map((o) => o.feature.key);
     }
 
-    // 5. Update last login
+    // 5. Update last login and Log
     if (userType === 'platform') {
       await this.prisma.platformUser.update({
         where: { id: user.id },
         data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
       });
+      await this.prisma.auditLog.create({
+        data: {
+          action: 'LOGIN',
+          entityType: 'PLATFORM_USER',
+          entityId: user.id,
+          userId: user.id,
+          userType: 'platform',
+          ipAddress,
+        },
+      });
     } else {
       await this.prisma.schoolUser.update({
         where: { id: user.id },
         data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
+      });
+      await this.prisma.auditLog.create({
+        data: {
+          action: 'LOGIN',
+          entityType: 'SCHOOL_USER',
+          entityId: user.id,
+          userId: user.id,
+          userType: 'school',
+          schoolId: user.schoolId,
+          ipAddress,
+        },
       });
     }
 
@@ -441,6 +462,17 @@ export class AuthService {
           break;
         }
       }
+
+      await this.prisma.auditLog.create({
+        data: {
+          action: 'LOGOUT',
+          entityType: userType === 'platform' ? 'PLATFORM_USER' : 'SCHOOL_USER',
+          entityId: userId,
+          userId,
+          userType: userType === 'platform' ? 'platform' : 'school',
+        },
+      });
+
       return { success: true, message: 'تم تسجيل الخروج بنجاح' };
     } catch (e) {
       // Just return success even if token is invalid during logout

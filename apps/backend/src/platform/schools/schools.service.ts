@@ -100,16 +100,46 @@ export class PlatformSchoolsService {
     return school;
   }
 
-  async update(id: string, data: any) {
-    return this.prisma.school.update({ where: { id }, data });
+  async update(id: string, data: any, currentUserId: string) {
+    const school = await this.prisma.school.update({ where: { id }, data });
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'UPDATE',
+        entityType: 'School',
+        entityId: id,
+        userId: currentUserId,
+        userType: 'platform',
+      }
+    });
+    return school;
   }
 
-  async suspend(id: string) {
-    return this.prisma.school.update({ where: { id }, data: { status: 'SUSPENDED', suspendedAt: new Date() } });
+  async suspend(id: string, currentUserId: string) {
+    const school = await this.prisma.school.update({ where: { id }, data: { status: 'SUSPENDED', suspendedAt: new Date() } });
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'SUSPEND',
+        entityType: 'School',
+        entityId: id,
+        userId: currentUserId,
+        userType: 'platform',
+      }
+    });
+    return school;
   }
 
-  async activate(id: string) {
-    return this.prisma.school.update({ where: { id }, data: { status: 'ACTIVE', suspendedAt: null } });
+  async activate(id: string, currentUserId: string) {
+    const school = await this.prisma.school.update({ where: { id }, data: { status: 'ACTIVE', suspendedAt: null } });
+    await this.prisma.auditLog.create({
+      data: {
+        action: 'ACTIVATE',
+        entityType: 'School',
+        entityId: id,
+        userId: currentUserId,
+        userType: 'platform',
+      }
+    });
+    return school;
   }
 
   async createSupportSession(schoolId: string, adminId: string) {

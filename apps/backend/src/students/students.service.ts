@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 
 @Injectable()
 export class StudentsService {
@@ -98,29 +99,35 @@ export class StudentsService {
       throw new BadRequestException('رقم الطالب المدرسي مستخدم بالفعل بهذه المدرسة');
     }
 
-    const student = await this.prisma.student.create({
-      data: {
-        schoolId,
-        schoolNumber: data.schoolNumber,
-        fullName: data.fullName,
-        gender: data.gender,
-        grade: data.grade,
-        classSection: data.classSection,
-        medicalNotes: data.medicalNotes,
-      },
-    });
+    // SaaS Limits Check with Concurrency Protection (Pessimistic Locking)
+    return this.prisma.$transaction(async (tx) => {
+      // Use Centralized Guard for School Status and Limits
+      await assertSchoolOperational(tx, schoolId, { checkMaxStudents: true });
 
-    if (data.guardianId) {
-      await this.prisma.studentGuardian.create({
+      const student = await tx.student.create({
         data: {
-          studentId: student.id,
-          guardianId: data.guardianId,
-          isPrimary: true,
+          schoolId,
+          schoolNumber: data.schoolNumber,
+          fullName: data.fullName,
+          gender: data.gender,
+          grade: data.grade,
+          classSection: data.classSection,
+          medicalNotes: data.medicalNotes,
         },
       });
-    }
 
-    return student;
+      if (data.guardianId) {
+        await tx.studentGuardian.create({
+          data: {
+            studentId: student.id,
+            guardianId: data.guardianId,
+            isPrimary: true,
+          },
+        });
+      }
+
+      return student;
+    });
   }
 
   async update(schoolId: string, id: string, data: any) {

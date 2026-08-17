@@ -14,6 +14,7 @@ import { CurrentUser, Roles } from '../common/decorators';
 import { SchoolRoleEnum, StudentTripStatus } from '../common/enums';
 import { TripsService } from './trips.service';
 import { StartTripDto } from './dto/start-trip.dto';
+import { TripSyncBatchDto } from './dto/trip-sync-batch.dto';
 
 @ApiTags('School Trips & Operations')
 @ApiBearerAuth()
@@ -84,5 +85,11 @@ export class TripsController {
   @ApiOperation({ summary: 'Complete trip' })
   completeTrip(@CurrentUser() user: any, @Param('id') id: string) {
     return this.tripsService.completeTrip(user.schoolId, id, user);
+  }
+
+  @Post('offline-sync')
+  @ApiOperation({ summary: 'Batch sync offline operational events' })
+  syncBatch(@CurrentUser() user: any, @Body() body: TripSyncBatchDto) {
+    return this.tripsService.syncBatch(user.schoolId, body.events, user);
   }
 }

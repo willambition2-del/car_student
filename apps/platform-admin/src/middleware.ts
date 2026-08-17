@@ -18,8 +18,10 @@ export async function middleware(request: NextRequest) {
 
   let mustChangePassword = false;
   try {
-    // For local development, fallback to the same mock secret in .env.example
-    const secretStr = process.env.JWT_ACCESS_SECRET || 'your-access-secret-min-32-chars-here';
+    const secretStr = process.env.JWT_ACCESS_SECRET;
+    if (!secretStr) {
+      throw new Error("JWT_ACCESS_SECRET is missing in environment variables.");
+    }
     const secret = new TextEncoder().encode(secretStr);
     
     const { payload } = await jwtVerify(token, secret);

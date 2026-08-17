@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/input";
 import { User, Lock, LogOut, ShieldCheck, Save } from "lucide-react";
+import { authApi } from "@/lib/api";
 
 export default function PlatformOwnerProfilePage() {
   const router = useRouter();
@@ -21,6 +22,11 @@ export default function PlatformOwnerProfilePage() {
       setOldPassword("");
       setNewPassword("");
     }, 800);
+  };
+
+  const handleLogout = async () => {
+    await authApi.logout();
+    router.push("/login");
   };
 
   return (
@@ -40,7 +46,7 @@ export default function PlatformOwnerProfilePage() {
             <span className="text-xs text-[#66758A]">مالك النظام الرئيسي (Super Admin Owner)</span>
           </div>
         </div>
-        <Button variant="danger" size="sm" icon={<LogOut className="w-4 h-4" />} onClick={() => router.push("/login")}>
+        <Button variant="danger" size="sm" icon={<LogOut className="w-4 h-4" />} onClick={handleLogout}>
           تسجيل الخروج
         </Button>
       </Card>

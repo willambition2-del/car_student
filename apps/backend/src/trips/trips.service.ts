@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StudentTripStatus } from '../common/enums';
+import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 
 type TripActor = { id: string; role: string };
 
@@ -158,34 +159,38 @@ export class TripsService {
     });
     if (!route) throw new NotFoundException('المسار غير موجود');
 
-    // 1. Create Trip record
-    const trip = await this.prisma.trip.create({
-      data: {
-        schoolId,
-        routeId: data.routeId,
-        busId: data.busId,
-        driverId: data.driverId || bus.driverId,
-        supervisorId: data.supervisorId || bus.supervisorId,
-        tripType: data.tripType || route.tripType,
-        status: 'STARTED',
-        tripDate: new Date(),
-        actualStartTime: new Date(),
-      },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      await assertSchoolOperational(tx, schoolId);
 
-    // 2. Populate Trip Students roster from Route
-    if (route.students.length > 0) {
-      await this.prisma.tripStudent.createMany({
-        data: route.students.map((rs) => ({
-          tripId: trip.id,
-          studentId: rs.studentId,
-          stopOrder: rs.order || 1,
-          status: 'WAITING',
-        })),
+      // 1. Create Trip record
+      const trip = await tx.trip.create({
+        data: {
+          schoolId,
+          routeId: data.routeId,
+          busId: data.busId,
+          driverId: data.driverId || bus.driverId,
+          supervisorId: data.supervisorId || bus.supervisorId,
+          tripType: data.tripType || route.tripType,
+          status: 'STARTED',
+          tripDate: new Date(),
+          actualStartTime: new Date(),
+        },
       });
-    }
 
-    return trip;
+      // 2. Populate Trip Students roster from Route
+      if (route.students.length > 0) {
+        await tx.tripStudent.createMany({
+          data: route.students.map((rs) => ({
+            tripId: trip.id,
+            studentId: rs.studentId,
+            stopOrder: rs.order || 1,
+            status: 'WAITING',
+          })),
+        });
+      }
+
+      return trip;
+    });
   }
 
   async updateStudentStatus(
@@ -259,5 +264,79 @@ export class TripsService {
         actualEndTime: new Date(),
       },
     });
+  }
+
+  async syncBatch(schoolId: string, events: any[], actor?: TripActor) {
+    const results = {
+      accepted: 0,
+      rejected: 0,
+      duplicates: 0,
+      details: [] as any[]
+    };
+
+    for (const event of events) {
+      try {
+        // 1. Idempotency Check
+        const existingEvent = await this.prisma.tripEvent.findUnique({
+          where: { operationId: event.clientEventId }
+        });
+        
+        if (existingEvent) {
+          results.duplicates++;
+          results.details.push({ id: event.clientEventId, status: 'DUPLICATE' });
+          continue;
+        }
+
+        // 2. Validate Trip & School
+        const trip = await this.prisma.trip.findFirst({
+          where: { id: event.tripId, schoolId }
+        });
+        
+        if (!trip) {
+          results.rejected++;
+          results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: 'Trip not found or unauthorized' });
+          continue;
+        }
+
+        // 3. Process Event
+        // Update the student status via existing logic, but catching errors gracefully
+        try {
+          await this.updateStudentStatus(
+            schoolId,
+            event.tripId,
+            event.studentId,
+            event.status,
+            'Offline Sync',
+            actor
+          );
+
+          // Log the event with the clientEventId to prevent future duplicates
+          await this.prisma.tripEvent.create({
+            data: {
+              operationId: event.clientEventId,
+              tripId: event.tripId,
+              studentId: event.studentId,
+              eventType: event.status,
+              newStatus: event.status,
+              recordedBy: actor?.id || 'SYSTEM',
+              deviceTimestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
+              source: 'OFFLINE_SYNC',
+              createdAt: event.timestamp ? new Date(event.timestamp) : new Date(),
+            }
+          });
+
+          results.accepted++;
+          results.details.push({ id: event.clientEventId, status: 'ACCEPTED' });
+        } catch (innerError: any) {
+          results.rejected++;
+          results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: innerError.message });
+        }
+      } catch (e: any) {
+        results.rejected++;
+        results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: e.message });
+      }
+    }
+
+    return results;
   }
 }

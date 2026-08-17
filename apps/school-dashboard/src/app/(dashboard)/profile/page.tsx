@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TextInput, PasswordInput } from "@/components/ui/input";
 import { User, Lock, LogOut, ShieldCheck, Save } from "lucide-react";
+import { authApi } from "@/lib/api";
 
 export default function ProfileSecurityPage() {
   const router = useRouter();
@@ -24,6 +25,11 @@ export default function ProfileSecurityPage() {
       setNewPassword("");
       setConfirmPassword("");
     }, 800);
+  };
+
+  const handleLogout = async () => {
+    await authApi.logout();
+    router.push("/login");
   };
 
   return (
@@ -44,7 +50,7 @@ export default function ProfileSecurityPage() {
             <span className="text-xs text-[#66758A]">مدير النقل المدرسي - مدارس المستقبل الأهلية</span>
           </div>
         </div>
-        <Button variant="danger" size="sm" icon={<LogOut className="w-4 h-4" />} onClick={() => router.push("/login")}>
+        <Button variant="danger" size="sm" icon={<LogOut className="w-4 h-4" />} onClick={handleLogout}>
           تسجيل الخروج
         </Button>
       </Card>

@@ -9,6 +9,7 @@ import { Card, StatsCard } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { School, Edit, ArrowRight, ShieldAlert, KeyRound, Globe, Users, Bus as BusIcon, CreditCard } from "lucide-react";
+import { platformSchoolsApi } from "@/lib/api";
 
 export default function SchoolDetailsPage() {
   const params = useParams();
@@ -19,11 +20,7 @@ export default function SchoolDetailsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/schools/${params.id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
+    platformSchoolsApi.getSchool(params.id as string)
       .then((data) => {
         setSchool(data);
         setLoading(false);

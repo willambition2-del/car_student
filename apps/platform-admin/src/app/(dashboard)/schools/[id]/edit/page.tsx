@@ -8,6 +8,7 @@ import { TextInput, SelectInput } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { School, ArrowRight, Save } from "lucide-react";
+import { platformSchoolsApi } from "@/lib/api";
 
 export default function EditSchoolTenantPage() {
   const params = useParams();
@@ -19,11 +20,7 @@ export default function EditSchoolTenantPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/schools/${params.id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
+    platformSchoolsApi.getSchool(params.id as string)
       .then((data) => {
         setSchool(data);
         setLoading(false);

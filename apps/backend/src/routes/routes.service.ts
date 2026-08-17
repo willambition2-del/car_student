@@ -4,6 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 
 @Injectable()
 export class RoutesService {
@@ -118,19 +119,23 @@ export class RoutesService {
         throw new BadRequestException('Bus does not belong to this school');
     }
 
-    return this.prisma.route.create({
-      data: {
-        schoolId,
-        nameAr: data.nameAr,
-        nameEn: data.nameEn,
-        description: data.description,
-        busId: data.busId,
-        tripType: data.tripType || 'MORNING',
-        estimatedDuration: data.estimatedDuration,
-        distanceKm: data.distanceKm,
-        polyline: data.polyline,
-        isActive: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await assertSchoolOperational(tx, schoolId);
+      
+      return tx.route.create({
+        data: {
+          schoolId,
+          nameAr: data.nameAr,
+          nameEn: data.nameEn,
+          description: data.description,
+          busId: data.busId,
+          tripType: data.tripType || 'MORNING',
+          estimatedDuration: data.estimatedDuration,
+          distanceKm: data.distanceKm,
+          polyline: data.polyline,
+          isActive: true,
+        },
+      });
     });
   }
 
@@ -154,9 +159,13 @@ export class RoutesService {
       polyline: data.polyline,
       isActive: data.isActive,
     };
-    return this.prisma.route.update({
-      where: { id },
-      data: safeData,
+    
+    return this.prisma.$transaction(async (tx) => {
+      await assertSchoolOperational(tx, schoolId);
+      return tx.route.update({
+        where: { id },
+        data: safeData,
+      });
     });
   }
 
@@ -193,20 +202,27 @@ export class RoutesService {
       throw new BadRequestException('الطالب مخصص مسبقاً بهذا المسار');
     }
 
-    return this.prisma.routeStudent.create({
-      data: {
-        routeId,
-        studentId,
-        stopId,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await assertSchoolOperational(tx, schoolId);
+      return tx.routeStudent.create({
+        data: {
+          routeId,
+          studentId,
+          stopId,
+        },
+      });
     });
   }
 
   async remove(schoolId: string, id: string) {
     await this.findOne(schoolId, id);
-    return this.prisma.route.update({
-      where: { id },
-      data: { deletedAt: new Date() },
+    
+    return this.prisma.$transaction(async (tx) => {
+      await assertSchoolOperational(tx, schoolId);
+      return tx.route.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
     });
   }
 }

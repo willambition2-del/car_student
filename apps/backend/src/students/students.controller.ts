@@ -14,8 +14,10 @@ import { SchoolContextGuard } from '../common/guards/school-context.guard';
 import { CurrentUser, Roles } from '../common/decorators';
 import { SchoolRoleEnum } from '../common/enums';
 import { StudentsService } from './students.service';
+import { ProximityService } from './proximity.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { ProximitySuggestionDto } from './dto/proximity-suggestion.dto';
 
 @ApiTags('School Students')
 @ApiBearerAuth()
@@ -28,7 +30,10 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 )
 @Controller('school/students')
 export class StudentsController {
-  constructor(private studentsService: StudentsService) {}
+  constructor(
+    private studentsService: StudentsService,
+    private proximityService: ProximityService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List all students for current school' })
@@ -45,6 +50,22 @@ export class StudentsController {
       Number(limit) || 20,
       search,
       grade,
+    );
+  }
+
+  @Post('proximity/suggestions')
+  @ApiOperation({ summary: 'Generate student proximity suggestions (Read Only)' })
+  @Roles(SchoolRoleEnum.TRANSPORT_MANAGER, SchoolRoleEnum.SCHOOL_ADMIN)
+  async generateProximitySuggestions(
+    @CurrentUser() user: any,
+    @Body() body: ProximitySuggestionDto,
+  ) {
+    return this.proximityService.findStudentsNearPoint(
+      user.schoolId,
+      body.targetLat,
+      body.targetLon,
+      body.radiusMeters,
+      body.maxCapacity,
     );
   }
 

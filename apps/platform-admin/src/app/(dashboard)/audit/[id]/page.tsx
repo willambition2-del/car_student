@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { History, ArrowRight, ShieldCheck, Terminal } from "lucide-react";
+import { platformAuditApi } from "@/lib/api";
 
 export default function AuditLogDetailsPage() {
   const params = useParams();
@@ -17,11 +18,7 @@ export default function AuditLogDetailsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/audit/${params.id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
+    platformAuditApi.getLog(params.id as string)
       .then((data) => {
         setLog(data);
         setLoading(false);

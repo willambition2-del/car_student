@@ -45,20 +45,20 @@ export class PlatformSchoolsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update school details' })
-  update(@Param('id') id: string, @Body() updateDto: any) {
-    return this.schoolsService.update(id, updateDto);
+  update(@Param('id') id: string, @Body() updateDto: any, @CurrentUser() user: any) {
+    return this.schoolsService.update(id, updateDto, user.id);
   }
 
   @Post(':id/suspend')
   @ApiOperation({ summary: 'Suspend school' })
-  suspend(@Param('id') id: string) {
-    return this.schoolsService.suspend(id);
+  suspend(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.schoolsService.suspend(id, user.id);
   }
 
   @Post(':id/activate')
   @ApiOperation({ summary: 'Activate school' })
-  activate(@Param('id') id: string) {
-    return this.schoolsService.activate(id);
+  activate(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.schoolsService.activate(id, user.id);
   }
 
   @Post(':id/support-session')
