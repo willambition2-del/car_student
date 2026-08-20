@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_typography.dart';
@@ -22,6 +23,8 @@ class ParentRouteMapScreen extends ConsumerWidget {
         ? students[selectedIndex]
         : MockData.students.first;
 
+    final hasLocation = student.pickupPoint.isNotEmpty;
+
     return AppScaffold(
       title: 'خريطة المسار الثابت',
       subtitle: 'عرض نقاط التجمع والمسار المعتمد للحافلة',
@@ -32,15 +35,22 @@ class ParentRouteMapScreen extends ConsumerWidget {
       ),
       body: Stack(
         children: [
-          MapPlaceholder(
-            title: 'مسار الطالب ${student.name}',
-            subtitle: 'حافلة رقم ${student.busNumber} • ${student.routeName}',
-            onRecenter: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم تثبيت الخريطة على نقطة تجمع الطالب المعينة'),
+          AppGoogleMapView(
+            initialCenter: const LatLng(24.8195, 46.6625),
+            initialZoom: 14.0,
+            emptyNotice: hasLocation ? null : 'لم يتم تحديد موقع المنزل ونقطة التجمع لهذا الطالب بعد',
+            markers: {
+              const Marker(
+                markerId: MarkerId('school_center'),
+                position: LatLng(24.8210, 46.6690),
+                infoWindow: InfoWindow(title: 'مدرسة تبيان التجريبية'),
+              ),
+              if (hasLocation)
+                const Marker(
+                  markerId: MarkerId('student_pickup'),
+                  position: LatLng(24.8195, 46.6625),
+                  infoWindow: InfoWindow(title: 'نقطة التجمع المعتمدة'),
                 ),
-              );
             },
           ),
           Positioned(

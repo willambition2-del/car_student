@@ -76,7 +76,7 @@ class TripService {
       await _apiClient.post('/school/trips/$tripId/student-status', data: {
         'studentId': studentId,
         'status': status.name.toUpperCase(),
-        if (notes != null) 'notes': notes,
+        'notes': ?notes,
       });
     } catch (e) {
       throw Exception('Failed to update student status: $e');

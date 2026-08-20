@@ -1,8 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_typography.dart';
 import '../../app/theme/app_shadows.dart';
+
+class AppGoogleMapView extends StatefulWidget {
+  final LatLng initialCenter;
+  final double initialZoom;
+  final Set<Marker> markers;
+  final Set<Polyline> polylines;
+  final void Function(LatLng)? onTap;
+  final void Function(CameraPosition)? onCameraMove;
+  final void Function(GoogleMapController)? onMapCreated;
+  final bool interactive;
+  final String? emptyNotice;
+
+  const AppGoogleMapView({
+    super.key,
+    this.initialCenter = const LatLng(24.8210, 46.6690),
+    this.initialZoom = 13.5,
+    this.markers = const <Marker>{},
+    this.polylines = const <Polyline>{},
+    this.onTap,
+    this.onCameraMove,
+    this.onMapCreated,
+    this.interactive = true,
+    this.emptyNotice,
+  });
+
+  @override
+  State<AppGoogleMapView> createState() => _AppGoogleMapViewState();
+}
+
+class _AppGoogleMapViewState extends State<AppGoogleMapView> {
+  GoogleMapController? _controller;
+  final bool _hasError = false;
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.emptyNotice != null) {
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: const Color(0xFFF8FAFC),
+        padding: const EdgeInsets.all(24),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: const BoxDecoration(
+                  color: AppColors.primarySoft,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.location_off_rounded,
+                  color: AppColors.primaryNavy,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                widget.emptyNotice!,
+                style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'يمكن لولي الأمر تحديد موقع المنزل من شاشة الملف الشخصي',
+                style: AppTypography.caption.copyWith(color: AppColors.secondaryText),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_hasError) {
+      return const MapPlaceholder(
+        title: 'خريطة المسارات المعتمدة',
+        subtitle: 'تعذر تحميل خريطة Google - جاري استخدام المعاينة التخطيطية',
+      );
+    }
+
+    return Stack(
+      children: [
+        GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: widget.initialCenter,
+            zoom: widget.initialZoom,
+          ),
+          markers: widget.markers,
+          polylines: widget.polylines,
+          onTap: widget.onTap,
+          onCameraMove: widget.onCameraMove,
+          onMapCreated: (ctrl) {
+            _controller = ctrl;
+            widget.onMapCreated?.call(ctrl);
+          },
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          mapToolbarEnabled: false,
+          rotateGesturesEnabled: widget.interactive,
+          scrollGesturesEnabled: widget.interactive,
+          zoomGesturesEnabled: widget.interactive,
+          tiltGesturesEnabled: false,
+        ),
+        Positioned(
+          bottom: 16,
+          left: 16,
+          child: FloatingActionButton.small(
+            backgroundColor: AppColors.surface,
+            foregroundColor: AppColors.primaryNavy,
+            elevation: 2,
+            onPressed: () {
+              _controller?.animateCamera(
+                CameraUpdate.newLatLngZoom(widget.initialCenter, widget.initialZoom),
+              );
+            },
+            child: const Icon(Icons.my_location_rounded, size: 20),
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class MapPlaceholder extends StatelessWidget {
   final String title;

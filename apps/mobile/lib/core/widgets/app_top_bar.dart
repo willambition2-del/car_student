@@ -21,10 +21,29 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBottomBorder = true,
   });
 
+  void _handleBack(BuildContext context) {
+    if (onBackPressed != null) {
+      onBackPressed!();
+      return;
+    }
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+    final currentLoc = GoRouterState.of(context).matchedLocation;
+    if (currentLoc.startsWith('/parent')) {
+      context.go('/parent/home');
+    } else if (currentLoc.startsWith('/supervisor')) {
+      context.go('/supervisor/home');
+    } else if (currentLoc.startsWith('/transport')) {
+      context.go('/transport/home');
+    } else {
+      context.go('/auth/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final canGoBack = showBackButton && (onBackPressed != null || context.canPop());
-
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -59,15 +78,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leadingWidth: canGoBack ? 48 : 16,
-        leading: canGoBack
+        leadingWidth: showBackButton ? 48 : 16,
+        leading: showBackButton
             ? IconButton(
                 icon: const Icon(
                   Icons.arrow_back_rounded,
                   color: AppColors.mainText,
                   size: 22,
                 ),
-                onPressed: onBackPressed ?? () => context.pop(),
+                onPressed: () => _handleBack(context),
                 tooltip: 'رجوع',
               )
             : const SizedBox.shrink(),

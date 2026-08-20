@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_typography.dart';
@@ -40,7 +41,7 @@ class _TransportOperationsCenterScreenState
 
     return AppScaffold(
       title: 'مركز الرقابة الميدانية والتشغيل',
-      subtitle: 'تتبع حركة الأسطول والطلاب المباشرة',
+      subtitle: 'متابعة الرحلات وحالة الطلاب',
       showBackButton: false,
       padding: EdgeInsets.zero,
       bottomNavigationBar: const RoleBottomNavigation(
@@ -48,9 +49,34 @@ class _TransportOperationsCenterScreenState
       ),
       body: Stack(
         children: [
-          const MapPlaceholder(
-            title: 'خريطة تتبع أسطول الحافلات المباشرة',
-            subtitle: 'تحديث لمستمر لـ 20 حافلة مدرسية و 480 طالب مسجل',
+          AppGoogleMapView(
+            initialCenter: const LatLng(24.8210, 46.6690),
+            initialZoom: 13.0,
+            markers: {
+              const Marker(
+                markerId: MarkerId('school_center'),
+                position: LatLng(24.8210, 46.6690),
+                infoWindow: InfoWindow(
+                  title: 'مدرسة تبيان التجريبية',
+                  snippet: 'المبنى الرئيسي للمدرسة',
+                ),
+              ),
+              const Marker(
+                markerId: MarkerId('stop_1'),
+                position: LatLng(24.8350, 46.6780),
+                infoWindow: InfoWindow(title: 'نقطة تجمع حي النرجس'),
+              ),
+              const Marker(
+                markerId: MarkerId('stop_2'),
+                position: LatLng(24.8020, 46.6340),
+                infoWindow: InfoWindow(title: 'نقطة تجمع حي الملقا'),
+              ),
+              const Marker(
+                markerId: MarkerId('stop_3'),
+                position: LatLng(24.8180, 46.6450),
+                infoWindow: InfoWindow(title: 'نقطة تجمع حي الياسمين'),
+              ),
+            },
           ),
           Positioned(
             top: 12,

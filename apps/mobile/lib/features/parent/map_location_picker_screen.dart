@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_typography.dart';
@@ -19,6 +20,7 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
   final _regionController = TextEditingController(text: 'حي النور');
   final _landmarkController = TextEditingController(text: 'بجوار مسجد الهدى');
   final _descriptionController = TextEditingController(text: 'شارع الخليج - فيلا 45');
+  LatLng _pickedLocation = const LatLng(24.8210, 46.6690);
   bool _isSaving = false;
 
   @override
@@ -34,6 +36,7 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
       _regionController.text = 'حي النزهة (موقعي الحالي)';
       _landmarkController.text = 'بالقرب من مركز الملك فهد';
       _descriptionController.text = 'مبنى 12 - الشقة 4';
+      _pickedLocation = const LatLng(24.8180, 46.6450);
     });
   }
 
@@ -55,9 +58,12 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
       padding: EdgeInsets.zero,
       body: Stack(
         children: [
-          const MapPlaceholder(
-            title: 'حرك الخريطة لتحديد موقع البيت بدقة',
-            subtitle: 'يتم حفظ الإحداثيات الجغرافية لقواعد البيانات',
+          AppGoogleMapView(
+            initialCenter: _pickedLocation,
+            initialZoom: 15.0,
+            onCameraMove: (pos) {
+              _pickedLocation = pos.target;
+            },
           ),
           Center(
             child: Column(
