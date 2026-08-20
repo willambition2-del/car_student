@@ -3,10 +3,16 @@ import { TripType } from '../../common/enums';
 
 export class StartTripDto {
   @IsUUID()
-  routeId: string;
+  @IsOptional()
+  tripId?: string;
 
   @IsUUID()
-  busId: string;
+  @IsOptional()
+  routeId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  busId?: string;
 
   @IsUUID()
   @IsOptional()

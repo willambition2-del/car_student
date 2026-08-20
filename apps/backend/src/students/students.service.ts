@@ -6,9 +6,17 @@ import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(schoolId: string, page = 1, limit = 20, search?: string, grade?: string) {
+  async findAll(schoolId: string, page = 1, limit = 20, search?: string, grade?: string, actor?: any) {
     const skip = (page - 1) * limit;
     const where: any = { schoolId, deletedAt: null };
+
+    if (actor?.role === 'PARENT') {
+      where.guardianLinks = {
+        some: {
+          guardian: { schoolUserId: actor.id, isActive: true, deletedAt: null },
+        },
+      };
+    }
 
     if (grade) where.grade = grade;
     if (search) {
@@ -62,9 +70,26 @@ export class StudentsService {
     };
   }
 
-  async findOne(schoolId: string, id: string) {
+  async findOne(schoolId: string, id: string, actor?: any) {
     const student = await this.prisma.student.findFirst({
-      where: { id, schoolId, deletedAt: null },
+      where: {
+        id,
+        schoolId,
+        deletedAt: null,
+        ...(actor?.role === 'PARENT'
+          ? {
+              guardianLinks: {
+                some: {
+                  guardian: {
+                    schoolUserId: actor.id,
+                    isActive: true,
+                    deletedAt: null,
+                  },
+                },
+              },
+            }
+          : {}),
+      },
       include: {
         guardianLinks: { include: { guardian: true } },
         locations: { where: { isActive: true } },
@@ -76,7 +101,7 @@ export class StudentsService {
     });
 
     if (!student) {
-      throw new NotFoundException('الطالب غير موجود');
+      throw new NotFoundException('الطالب غير موجود أو غير مخصص لك');
     }
 
     return student;

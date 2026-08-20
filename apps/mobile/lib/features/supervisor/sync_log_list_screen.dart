@@ -9,7 +9,6 @@ import '../../core/widgets/state_widgets.dart';
 import '../../core/widgets/sync_operation_card.dart';
 import '../../mock/mock_repository.dart';
 import '../../core/sync/sync_service.dart';
-import '../../mock/models/models.dart';
 
 class SyncLogListScreen extends ConsumerWidget {
   const SyncLogListScreen({super.key});

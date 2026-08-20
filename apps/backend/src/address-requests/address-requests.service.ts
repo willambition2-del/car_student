@@ -9,9 +9,19 @@ import { PrismaService } from '../prisma/prisma.service';
 export class AddressRequestsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(schoolId: string, page = 1, limit = 20, status?: string) {
+  async findAll(schoolId: string, page = 1, limit = 20, status?: string, actor?: any) {
     const skip = (page - 1) * limit;
     const where: any = { schoolId };
+
+    if (actor?.role === 'PARENT') {
+      where.student = {
+        guardianLinks: {
+          some: {
+            guardian: { schoolUserId: actor.id, isActive: true, deletedAt: null },
+          },
+        },
+      };
+    }
 
     if (status && status !== 'ALL') {
       where.status = status;
@@ -67,9 +77,27 @@ export class AddressRequestsService {
     };
   }
 
-  async findOne(schoolId: string, id: string) {
+  async findOne(schoolId: string, id: string, actor?: any) {
     const req = await this.prisma.addressChangeRequest.findFirst({
-      where: { id, schoolId },
+      where: {
+        id,
+        schoolId,
+        ...(actor?.role === 'PARENT'
+          ? {
+              student: {
+                guardianLinks: {
+                  some: {
+                    guardian: {
+                      schoolUserId: actor.id,
+                      isActive: true,
+                      deletedAt: null,
+                    },
+                  },
+                },
+              },
+            }
+          : {}),
+      },
       include: {
         student: {
           include: {
@@ -81,7 +109,7 @@ export class AddressRequestsService {
     });
 
     if (!req) {
-      throw new NotFoundException('طلب تغيير العنوان غير موجود');
+      throw new NotFoundException('طلب تغيير العنوان غير موجود أو غير مخصص لك');
     }
 
     return req;
@@ -91,12 +119,13 @@ export class AddressRequestsService {
     schoolId: string,
     data: {
       studentId: string;
-      guardianId: string;
+      guardianId?: string;
       newLatitude: number;
       newLongitude: number;
       newAddress?: string;
       notes?: string;
     },
+    actor?: any,
   ) {
     if (
       !Number.isFinite(data.newLatitude) ||
@@ -108,10 +137,27 @@ export class AddressRequestsService {
     ) {
       throw new BadRequestException('Invalid coordinates');
     }
+
+    let guardianId = data.guardianId;
+
+    if (actor?.role === 'PARENT') {
+      const guardian = await this.prisma.guardian.findFirst({
+        where: { schoolId, schoolUserId: actor.id, isActive: true, deletedAt: null },
+      });
+      if (!guardian) {
+        throw new BadRequestException('سجل ولي الأمر غير موجود أو غير مفعل');
+      }
+      guardianId = guardian.id;
+    }
+
+    if (!guardianId) {
+      throw new BadRequestException('guardianId is required');
+    }
+
     const guardianLink = await this.prisma.studentGuardian.findFirst({
       where: {
         studentId: data.studentId,
-        guardianId: data.guardianId,
+        guardianId,
         student: { schoolId, deletedAt: null },
         guardian: { schoolId, deletedAt: null },
       },
@@ -125,7 +171,7 @@ export class AddressRequestsService {
       data: {
         schoolId,
         studentId: data.studentId,
-        requestedBy: data.guardianId,
+        requestedBy: guardianId,
         newLatitude: data.newLatitude,
         newLongitude: data.newLongitude,
         newAddress: data.newAddress,

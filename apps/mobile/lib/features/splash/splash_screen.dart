@@ -8,8 +8,8 @@ import '../../app/theme/app_typography.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/storage/secure_storage_service.dart';
 import '../../mock/mock_repository.dart';
-import '../../mock/models/models.dart';
 import '../../core/utils/role_route_mapper.dart';
+import '../auth/services/auth_service.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -41,21 +41,39 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _timer = Timer(const Duration(seconds: 2), () async {
       try {
-        final roleStr = await SecureStorageService.getUserRole();
+        final token = await SecureStorageService.getAccessToken();
         final hasSeenOnboarding = await SecureStorageService.hasSeenOnboarding();
-        if (roleStr != null) {
-          ref.read(selectedRoleProvider.notifier).state = RoleRouteMapper.getUserRoleEnum(roleStr);
+
+        if (token != null && token.isNotEmpty) {
+          try {
+            // Validate with backend
+            final data = await AuthService().verifySession();
+            final userRole = data['user']?['role']?.toString() ?? data['role']?.toString();
+
+            if (userRole != null) {
+              ref.read(selectedRoleProvider.notifier).state = RoleRouteMapper.getUserRoleEnum(userRole);
+              if (mounted) {
+                // Let app_router handle the actual redirection by going to a public path that forwards, or directly to home.
+                // But better: we go to auth/login and let the router intercept it, OR directly to the home screen.
+                context.go('/auth/login');
+              }
+              return;
+            }
+          } catch (e) {
+            // Verification failed (e.g. 401). Interceptor already cleared storage if refresh failed.
+            await SecureStorageService.clearAuthData();
+          }
         }
         
         if (mounted) {
-          if (hasSeenOnboarding || roleStr != null) {
+          if (hasSeenOnboarding) {
             context.go('/auth/login');
           } else {
             context.go('/onboarding');
           }
         }
       } catch (e) {
-        // Fallback in case storage throws exception (e.g. corruption)
+        // Fallback in case storage throws exception
         if (mounted) {
           context.go('/auth/login');
         }

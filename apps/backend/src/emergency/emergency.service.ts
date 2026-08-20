@@ -5,15 +5,26 @@ import { PrismaService } from '../prisma/prisma.service';
 export class EmergencyService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(schoolId: string, page = 1, limit = 20, status?: string) {
+  async findAll(schoolId: string, page = 1, limit = 20, status?: string, actor?: any) {
     const skip = (page - 1) * limit;
+
+    const where: any = {
+      trip: {
+        schoolId,
+        ...(actor?.role === 'SUPERVISOR'
+          ? { supervisor: { schoolUserId: actor.id } }
+          : {}),
+      },
+      eventType: { in: ['EMERGENCY', 'EMERGENCY_BREAKDOWN', 'EMERGENCY_ACCIDENT'] },
+    };
+
+    if (status && status !== 'ALL') {
+      where.newStatus = status;
+    }
 
     const [items, total] = await Promise.all([
       this.prisma.tripEvent.findMany({
-        where: {
-          eventType: { in: ['EMERGENCY', 'EMERGENCY_BREAKDOWN', 'EMERGENCY_ACCIDENT'] },
-          ...(status && status !== 'ALL' ? { newStatus: status } : {}),
-        },
+        where,
         skip,
         take: limit,
         include: {
@@ -21,11 +32,7 @@ export class EmergencyService {
         },
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.tripEvent.count({
-        where: {
-          eventType: { in: ['EMERGENCY', 'EMERGENCY_BREAKDOWN', 'EMERGENCY_ACCIDENT'] },
-        },
-      }),
+      this.prisma.tripEvent.count({ where }),
     ]);
 
     return {
@@ -56,7 +63,21 @@ export class EmergencyService {
     latitude?: number;
     longitude?: number;
     recordedBy?: string;
-  }) {
+  }, actor?: any) {
+    const trip = await this.prisma.trip.findFirst({
+      where: {
+        id: data.tripId,
+        schoolId,
+        ...(actor?.role === 'SUPERVISOR'
+          ? { supervisor: { schoolUserId: actor.id } }
+          : {}),
+      },
+    });
+
+    if (!trip) {
+      throw new NotFoundException('الرحلة غير موجودة أو غير مصرح لك بالوصول إليها');
+    }
+
     return this.prisma.tripEvent.create({
       data: {
         tripId: data.tripId,
@@ -65,7 +86,7 @@ export class EmergencyService {
         newStatus: 'OPEN',
         latitude: data.latitude || 24.7136,
         longitude: data.longitude || 46.6753,
-        recordedBy: data.recordedBy || 'driver',
+        recordedBy: actor?.id || data.recordedBy || 'supervisor',
         recordedByName: data.description,
         deviceTimestamp: new Date(),
       },
@@ -75,9 +96,10 @@ export class EmergencyService {
   async resolveReport(schoolId: string, id: string, notes?: string) {
     const event = await this.prisma.tripEvent.findUnique({
       where: { id },
+      include: { trip: true },
     });
 
-    if (!event) {
+    if (!event || event.trip.schoolId !== schoolId) {
       throw new NotFoundException('البلاغ الطارئ غير موجود');
     }
 

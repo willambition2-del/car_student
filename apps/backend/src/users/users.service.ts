@@ -12,6 +12,10 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(schoolId: string, createUserDto: CreateUserDto, currentUserId: string) {
+    if ((createUserDto.role as any) === 'DRIVER') {
+      throw new ConflictException('لا يمكن إنشاء حساب دخول للسائق، السائق يسجل كبيان إداري فقط');
+    }
+
     const existing = await this.prisma.schoolUser.findFirst({
       where: { schoolId, email: createUserDto.email }
     });
@@ -113,7 +117,11 @@ export class UsersService {
 
   async update(schoolId: string, id: string, updateUserDto: UpdateUserDto) {
     // Verify existence & school isolation
-    await this.findOne(schoolId, id);
+    const targetUser = await this.findOne(schoolId, id);
+
+    if ((updateUserDto.role as any) === 'DRIVER') {
+      throw new ConflictException('لا يمكن تغيير دور المستخدم إلى سائق، السائق يسجل كبيان إداري فقط');
+    }
 
     if (updateUserDto.email) {
       const existing = await this.prisma.schoolUser.findFirst({
@@ -130,9 +138,6 @@ export class UsersService {
       delete data.password;
     }
     if (data.permissions !== undefined) {
-      // Simplification: updating permissions. Actually it's a separate model in DB (`SchoolUserPermission`)
-      // But let's assume we manage it through standard relation updates or ignore for this snippet.
-      // Wait, let's remove it from `data` since it needs separate processing.
       delete data.permissions;
     }
 

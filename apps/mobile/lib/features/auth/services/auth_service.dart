@@ -34,6 +34,31 @@ class AuthService {
     return data;
   }
 
+  Future<Map<String, dynamic>> verifySession() async {
+    final data = await _apiClient.get('/auth/me');
+
+    final user = data['user'] as Map<String, dynamic>? ?? data;
+
+    // Update local cached role/email if necessary from backend response
+    if (user['role'] != null) {
+      final oldRole = await SecureStorageService.getUserRole();
+      if (oldRole != user['role'].toString()) {
+        await SecureStorageService.saveAuthData(
+          accessToken: (await SecureStorageService.getAccessToken()) ?? '',
+          refreshToken: (await SecureStorageService.getRefreshToken()) ?? '',
+          userId: user['id']?.toString() ?? '',
+          userRole: user['role'].toString(),
+          email: user['email']?.toString() ?? '',
+          fullName: user['fullName']?.toString() ?? '',
+          mustChangePassword: user['mustChangePassword'] as bool? ?? false,
+          schoolId: user['schoolId']?.toString(),
+        );
+      }
+    }
+
+    return data;
+  }
+
   Future<void> forgotPassword(String email) async {
     await _apiClient.post('/auth/forgot-password', data: {'email': email});
   }

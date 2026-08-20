@@ -20,6 +20,7 @@ import { AbsenceRequestsService } from './absence-requests.service';
   SchoolRoleEnum.SCHOOL_OWNER,
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.TRANSPORT_MANAGER,
+  SchoolRoleEnum.PARENT,
 )
 @Controller('school/absence-requests')
 export class AbsenceRequestsController {
@@ -38,22 +39,28 @@ export class AbsenceRequestsController {
       Number(page) || 1,
       Number(limit) || 20,
       status,
+      user,
     );
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get absence request details' })
   findOne(@CurrentUser() user: any, @Param('id') id: string) {
-    return this.absenceRequestsService.findOne(user.schoolId, id);
+    return this.absenceRequestsService.findOne(user.schoolId, id, user);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create new absence request' })
   create(@CurrentUser() user: any, @Body() body: any) {
-    return this.absenceRequestsService.create(user.schoolId, body);
+    return this.absenceRequestsService.create(user.schoolId, body, user);
   }
 
   @Post(':id/approve')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Approve absence request' })
   approve(
     @CurrentUser() user: any,
@@ -64,6 +71,11 @@ export class AbsenceRequestsController {
   }
 
   @Post(':id/reject')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Reject absence request' })
   reject(
     @CurrentUser() user: any,

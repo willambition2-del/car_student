@@ -20,6 +20,7 @@ import { FinancialService } from './financial.service';
   SchoolRoleEnum.SCHOOL_OWNER,
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.ACCOUNTANT,
+  SchoolRoleEnum.PARENT,
 )
 @Controller('school/financial')
 export class FinancialController {
@@ -40,16 +41,27 @@ export class FinancialController {
       Number(limit) || 20,
       search,
       status,
+      user,
     );
   }
 
   @Post('fees')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.ACCOUNTANT,
+  )
   @ApiOperation({ summary: 'Create transport fee' })
   createFee(@CurrentUser() user: any, @Body() body: any) {
     return this.financialService.createFee(user.schoolId, body);
   }
 
   @Post('payments')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.ACCOUNTANT,
+  )
   @ApiOperation({ summary: 'Record payment for transport fee' })
   recordPayment(@CurrentUser() user: any, @Body() body: any) {
     return this.financialService.recordPayment(user.schoolId, {
@@ -71,6 +83,7 @@ export class FinancialController {
       Number(page) || 1,
       Number(limit) || 20,
       search,
+      user,
     );
   }
 }

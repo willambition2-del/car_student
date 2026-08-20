@@ -11,6 +11,7 @@ import '../../core/widgets/section_header.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../mock/mock_repository.dart';
 import '../../mock/models/models.dart';
+import 'services/trip_service.dart';
 
 class SupervisorHomeScreen extends ConsumerWidget {
   const SupervisorHomeScreen({super.key});
@@ -36,6 +37,13 @@ class SupervisorHomeScreen extends ConsumerWidget {
                   const Icon(Icons.directions_bus_outlined, size: 64, color: AppColors.border),
                   const SizedBox(height: 16),
                   Text('لا توجد رحلة نشطة حالياً', style: AppTypography.titleLarge),
+                  const SizedBox(height: 24),
+                  PrimaryButton(
+                    text: 'عرض الرحلات المجدولة',
+                    icon: Icons.list_alt_rounded,
+                    width: 250,
+                    onPressed: () => context.push('/supervisor/trips'),
+                  ),
                 ],
               ),
             ),
@@ -193,10 +201,24 @@ class SupervisorHomeScreen extends ConsumerWidget {
                         : 'بدء الرحلة الآن',
                     icon: Icons.play_arrow_rounded,
                     height: 50,
-                    onPressed: () {
-                      // // ref.read(activeTripProvider.notifier).state = trip
-                          // trip.copyWith(status: TripStatus.inProgress);
-                      context.push('/supervisor/trip/active');
+                    onPressed: () async {
+                      if (trip.status != TripStatus.inProgress) {
+                        try {
+                          await ref.read(tripServiceProvider).startTrip(trip.id);
+                          ref.invalidate(activeTripProvider);
+                          ref.invalidate(scheduledTripsProvider);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('فشل بدء الرحلة: $e')),
+                            );
+                          }
+                          return;
+                        }
+                      }
+                      if (context.mounted) {
+                        context.push('/supervisor/trip/active');
+                      }
                     },
                   ),
                 ],

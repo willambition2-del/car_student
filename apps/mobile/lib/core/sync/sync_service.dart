@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../mock/models/models.dart';
-import '../storage/secure_storage_service.dart';
 import '../../features/supervisor/services/trip_service.dart';
 
 final syncServiceProvider = Provider((ref) => SyncService(ref));

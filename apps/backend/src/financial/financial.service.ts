@@ -17,9 +17,20 @@ export class FinancialService {
     limit = 20,
     search?: string,
     status?: string,
+    actor?: any,
   ) {
     const skip = (page - 1) * limit;
     const where: any = { schoolId };
+
+    if (actor?.role === 'PARENT') {
+      where.student = {
+        guardianLinks: {
+          some: {
+            guardian: { schoolUserId: actor.id, isActive: true, deletedAt: null },
+          },
+        },
+      };
+    }
 
     if (status && status !== 'ALL') {
       where.status = status as any;
@@ -27,6 +38,7 @@ export class FinancialService {
 
     if (search) {
       where.student = {
+        ...where.student,
         fullName: { contains: search, mode: 'insensitive' },
       };
     }
@@ -226,9 +238,23 @@ export class FinancialService {
     });
   }
 
-  async findReceipts(schoolId: string, page = 1, limit = 20, search?: string) {
+  async findReceipts(schoolId: string, page = 1, limit = 20, search?: string, actor?: any) {
     const skip = (page - 1) * limit;
     const where: any = { schoolId };
+
+    if (actor?.role === 'PARENT') {
+      where.payment = {
+        transportFee: {
+          student: {
+            guardianLinks: {
+              some: {
+                guardian: { schoolUserId: actor.id, isActive: true, deletedAt: null },
+              },
+            },
+          },
+        },
+      };
+    }
 
     if (search) {
       where.OR = [

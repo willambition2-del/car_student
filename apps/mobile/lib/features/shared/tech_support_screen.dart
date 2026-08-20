@@ -8,7 +8,6 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_text_fields.dart';
 import '../../core/widgets/status_badge.dart';
 import '../../mock/mock_repository.dart';
-import '../../mock/models/models.dart';
 
 class TechSupportScreen extends ConsumerStatefulWidget {
   const TechSupportScreen({super.key});
@@ -35,18 +34,6 @@ class _TechSupportScreenState extends ConsumerState<TechSupportScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
       await Future.delayed(const Duration(milliseconds: 600));
-
-      final ticket = SupportTicketModel(
-        id: 'tkt_${DateTime.now().millisecondsSinceEpoch}',
-        category: _selectedCategory,
-        subject: _subjectController.text,
-        description: _descController.text,
-        status: 'مفتوحة',
-        createdAt: 'الآن',
-      );
-
-      final current = ref.read(supportTicketsProvider).value;
-      // ref.read(supportTicketsProvider.notifier).state = [ticket, ...current];
 
       if (mounted) {
         setState(() => _isLoading = false);

@@ -30,7 +30,6 @@ export class NotificationsController {
     SchoolRoleEnum.SCHOOL_OWNER,
     SchoolRoleEnum.SCHOOL_ADMIN,
     SchoolRoleEnum.TRANSPORT_MANAGER,
-    SchoolRoleEnum.SUPERVISOR,
   )
   @ApiOperation({ summary: 'List all sent notifications (Admin view)' })
   findAll(
@@ -63,7 +62,21 @@ export class NotificationsController {
   @Get('unread')
   @ApiOperation({ summary: 'Get unread notifications for current user' })
   getUnread(@CurrentUser() user: any) {
-    return this.notificationsService.getUnreadForUser(user.sub); // JWT sub is userId
+    return this.notificationsService.getUnreadForUser(user.sub);
+  }
+
+  @Get('my')
+  @ApiOperation({ summary: 'Get notifications list for current user' })
+  getMy(
+    @CurrentUser() user: any,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.notificationsService.getForUser(
+      user.sub,
+      Number(page) || 1,
+      Number(limit) || 20,
+    );
   }
 
   @Patch(':id/read')

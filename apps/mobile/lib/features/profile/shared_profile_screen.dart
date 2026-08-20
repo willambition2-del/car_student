@@ -9,6 +9,7 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/bottom_navigation.dart';
 import '../../core/widgets/dialogs_sheets.dart';
 import '../../mock/mock_repository.dart';
+import '../auth/services/auth_service.dart';
 
 class SharedProfileScreen extends ConsumerWidget {
   const SharedProfileScreen({super.key});
@@ -152,9 +153,22 @@ class SharedProfileScreen extends ConsumerWidget {
                 AppDialog.show(
                   context: context,
                   title: 'تسجيل الخروج',
-                  content: 'هل أنت تأكد من رغبتك في تسجيل الخروج؟',
-                  confirmText: 'تأكيد الخروج',
-                  onConfirm: () => context.go('/auth/login'),
+                  content: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
+                  confirmText: 'تسجيل الخروج',
+                  onConfirm: () async {
+                    await AuthService().logout();
+                    ref.invalidate(selectedRoleProvider);
+                    ref.invalidate(studentsListProvider);
+                    ref.invalidate(notificationsProvider);
+                    ref.invalidate(absenceRequestsProvider);
+                    ref.invalidate(addressRequestsProvider);
+                    ref.invalidate(activeTripProvider);
+                    ref.invalidate(scheduledTripsProvider);
+                    ref.invalidate(syncOperationsProvider);
+                    if (context.mounted) {
+                      context.go('/auth/login');
+                    }
+                  },
                 );
               },
             ),

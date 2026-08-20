@@ -216,6 +216,13 @@ export class RoutesService {
 
   async remove(schoolId: string, id: string) {
     await this.findOne(schoolId, id);
+
+    const activeTrip = await this.prisma.trip.findFirst({
+      where: { routeId: id, schoolId, status: 'STARTED' },
+    });
+    if (activeTrip) {
+      throw new BadRequestException('لا يمكن حذف المسار لوجود رحلة جارية حالياً');
+    }
     
     return this.prisma.$transaction(async (tx) => {
       await assertSchoolOperational(tx, schoolId);

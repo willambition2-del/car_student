@@ -96,6 +96,13 @@ export class NotificationsService {
         select: { id: true },
       });
       data.recipientIds = users.map(u => u.id);
+    } else {
+      // Validate provided recipientIds belong to this school
+      const validUsers = await this.prisma.schoolUser.findMany({
+        where: { id: { in: data.recipientIds }, schoolId, isActive: true },
+        select: { id: true },
+      });
+      data.recipientIds = validUsers.map(u => u.id);
     }
 
     // 2. Create Recipients
@@ -153,18 +160,189 @@ export class NotificationsService {
   }
 
   async getUnreadForUser(userId: string) {
-    return this.prisma.notificationRecipient.findMany({
+    const recipients = await this.prisma.notificationRecipient.findMany({
       where: { userId, isRead: false },
       include: { notification: true },
       orderBy: { createdAt: 'desc' },
     });
+
+    return recipients.map((r) => ({
+      id: r.notificationId,
+      recipientId: r.id,
+      title: r.notification.title,
+      body: r.notification.body,
+      time: this.formatNotificationTime(r.createdAt),
+      category: r.notification.type.toString().startsWith('STUDENT_') ? 'رحلات' : 'نظام',
+      type: r.notification.type,
+      isRead: r.isRead,
+      readAt: r.readAt,
+      studentId: r.notification.studentId,
+      tripId: r.notification.tripId,
+      createdAt: r.createdAt,
+    }));
+  }
+
+  async getForUser(userId: string, page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+    const [recipients, total] = await Promise.all([
+      this.prisma.notificationRecipient.findMany({
+        where: { userId },
+        include: { notification: true },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.notificationRecipient.count({ where: { userId } }),
+    ]);
+
+    return {
+      items: recipients.map((r) => ({
+        id: r.notificationId,
+        recipientId: r.id,
+        title: r.notification.title,
+        body: r.notification.body,
+        time: this.formatNotificationTime(r.createdAt),
+        category: r.notification.type.toString().startsWith('STUDENT_') ? 'رحلات' : 'نظام',
+        type: r.notification.type,
+        isRead: r.isRead,
+        readAt: r.readAt,
+        studentId: r.notification.studentId,
+        tripId: r.notification.tripId,
+        createdAt: r.createdAt,
+      })),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async markAsRead(notificationId: string, userId: string) {
-    return this.prisma.notificationRecipient.update({
+    const recipient = await this.prisma.notificationRecipient.findUnique({
       where: { notificationId_userId: { notificationId, userId } },
+    });
+
+    if (!recipient) {
+      throw new Error('الإشعار غير موجود أو غير مخصص لك');
+    }
+
+    return this.prisma.notificationRecipient.update({
+      where: { id: recipient.id },
       data: { isRead: true, readAt: new Date() },
     });
+  }
+
+  /**
+   * Send notification directly to a student's active guardians
+   */
+  async notifyStudentGuardians(
+    schoolId: string,
+    data: {
+      studentId: string;
+      tripId: string;
+      type: any;
+      title: string;
+      body: string;
+      operationId?: string;
+      actionType?: string;
+      metadata?: any;
+    },
+  ) {
+    // 1. Resolve student and active guardians with app accounts
+    const student = await this.prisma.student.findFirst({
+      where: { id: data.studentId, schoolId },
+      include: {
+        guardianLinks: {
+          include: {
+            guardian: {
+              include: {
+                schoolUser: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!student) return null;
+
+    const recipientUserIds: string[] = [];
+    for (const link of student.guardianLinks) {
+      if (
+        link.guardian &&
+        link.guardian.isActive &&
+        link.guardian.schoolUserId &&
+        link.guardian.schoolUser?.isActive
+      ) {
+        recipientUserIds.push(link.guardian.schoolUserId);
+      }
+    }
+
+    if (recipientUserIds.length === 0) {
+      return null;
+    }
+
+    // 2. Idempotency Check: Prevent duplicate notifications for the same operationId
+    if (data.operationId) {
+      const existing = await this.prisma.notification.findFirst({
+        where: {
+          schoolId,
+          entityType: 'TRIP_EVENT',
+          entityId: data.operationId,
+        },
+      });
+      if (existing) {
+        return existing;
+      }
+    }
+
+    // 3. Persist Notification in PostgreSQL (Source of Truth)
+    const notification = await this.prisma.notification.create({
+      data: {
+        schoolId,
+        title: data.title,
+        body: data.body,
+        targetRole: 'PARENT',
+        type: data.type,
+        isGlobal: false,
+        studentId: data.studentId,
+        tripId: data.tripId,
+        entityType: 'TRIP_EVENT',
+        entityId: data.operationId,
+        actionType: data.actionType || data.type,
+        data: {
+          studentId: data.studentId,
+          studentName: student.fullName,
+          tripId: data.tripId,
+          ...data.metadata,
+        },
+      },
+    });
+
+    // 4. Create Notification Recipients for exact guardians
+    await this.prisma.notificationRecipient.createMany({
+      data: recipientUserIds.map((userId) => ({
+        notificationId: notification.id,
+        userId,
+        isRead: false,
+      })),
+      skipDuplicates: true,
+    });
+
+    // 5. Dispatch Self-Hosted Push (ntfy / UnifiedPush)
+    this.dispatchPushNotifications(notification.id, recipientUserIds, data);
+
+    return notification;
+  }
+
+  private formatNotificationTime(date: Date): string {
+    try {
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch {
+      return '';
+    }
   }
 }
 

@@ -182,6 +182,8 @@ export class AuthService {
           entityId: user.id,
           userId: user.id,
           userType: 'platform',
+          userName: user.fullName,
+          userRole: user.role,
           ipAddress,
         },
       });
@@ -195,9 +197,10 @@ export class AuthService {
           action: 'LOGIN',
           entityType: 'SCHOOL_USER',
           entityId: user.id,
-          userId: user.id,
           userType: 'school',
           schoolId: user.schoolId,
+          userName: user.fullName,
+          userRole: user.role,
           ipAddress,
         },
       });
@@ -468,7 +471,7 @@ export class AuthService {
           action: 'LOGOUT',
           entityType: userType === 'platform' ? 'PLATFORM_USER' : 'SCHOOL_USER',
           entityId: userId,
-          userId,
+          userId: userType === 'platform' ? userId : undefined,
           userType: userType === 'platform' ? 'platform' : 'school',
         },
       });

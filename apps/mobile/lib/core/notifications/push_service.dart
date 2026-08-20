@@ -1,10 +1,7 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:unifiedpush/unifiedpush.dart';
-import 'package:unifiedpush_platform_interface/data/push_endpoint.dart';
-import 'package:unifiedpush_platform_interface/data/push_message.dart';
-import 'package:unifiedpush_platform_interface/data/failed_reason.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PushService {
@@ -14,49 +11,45 @@ class PushService {
 
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   final _storage = const FlutterSecureStorage();
+  final Dio _dio = Dio();
   
   bool _initialized = false;
 
   Future<void> init() async {
     if (_initialized) return;
 
-    // Initialize local notifications
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    
-    // Setup Android Channels
-    const AndroidNotificationChannel generalChannel = AndroidNotificationChannel(
-      'general',
-      'General Notifications',
-      description: 'System announcements and general updates',
-      importance: Importance.defaultImportance,
+    // 1. Initialize FlutterLocalNotificationsPlugin for system tray display
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
-    
-    const AndroidNotificationChannel tripChannel = AndroidNotificationChannel(
-      'trip_updates',
-      'Trip Updates',
-      description: 'Updates regarding trips, boarding, and drop-offs',
-      importance: Importance.high,
-    );
-
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(generalChannel);
-        
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(tripChannel);
-
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
     );
 
     await _localNotifications.initialize(
-      settings: initializationSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
-    // Initialize UnifiedPush
+    // Create Notification Channel for Android
+    const androidChannel = AndroidNotificationChannel(
+      'school_bus_alerts',
+      'تنبيهات النقل المدرسي',
+      description: 'إشعارات صعود ونزول الطلاب وتحديثات الرحلات المدرسية',
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+    );
+
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+
+    // 2. Initialize UnifiedPush / ntfy receiver
     UnifiedPush.initialize(
       onNewEndpoint: _onNewEndpoint,
       onRegistrationFailed: _onRegistrationFailed,
@@ -90,18 +83,20 @@ class PushService {
       final token = await _storage.read(key: 'auth_token');
       if (token != null) {
         final apiBaseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://2.24.141.70:3210/api/v1');
-        final url = Uri.parse('$apiBaseUrl/school/notifications/register-device');
-        await http.post(
+        final url = '$apiBaseUrl/school/notifications/register-device';
+        await _dio.post(
           url,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
-          },
-          body: jsonEncode({
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          ),
+          data: {
             'endpoint': endpoint.url,
             'pushProvider': 'UNIFIED_PUSH',
             'platform': 'ANDROID',
-          }),
+          },
         );
       }
     } catch (e) {

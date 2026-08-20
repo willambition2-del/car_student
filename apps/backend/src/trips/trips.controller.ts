@@ -24,6 +24,7 @@ import { TripSyncBatchDto } from './dto/trip-sync-batch.dto';
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.TRANSPORT_MANAGER,
   SchoolRoleEnum.SUPERVISOR,
+  SchoolRoleEnum.PARENT,
 )
 @Controller('school/trips')
 export class TripsController {
@@ -57,12 +58,36 @@ export class TripsController {
   }
 
   @Post('start')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.SUPERVISOR,
+  )
   @ApiOperation({ summary: 'Start a new trip' })
   startTrip(@CurrentUser() user: any, @Body() body: StartTripDto) {
     return this.tripsService.startTrip(user.schoolId, body, user);
   }
 
+  @Post('offline-sync')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.SUPERVISOR,
+  )
+  @ApiOperation({ summary: 'Batch sync offline operational events' })
+  syncBatch(@CurrentUser() user: any, @Body() body: TripSyncBatchDto) {
+    return this.tripsService.syncBatch(user.schoolId, body.events, user);
+  }
+
   @Post(':id/student-status')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.SUPERVISOR,
+  )
   @ApiOperation({ summary: 'Update student status on trip roster' })
   updateStudentStatus(
     @CurrentUser() user: any,
@@ -82,14 +107,14 @@ export class TripsController {
   }
 
   @Post(':id/complete')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.SUPERVISOR,
+  )
   @ApiOperation({ summary: 'Complete trip' })
   completeTrip(@CurrentUser() user: any, @Param('id') id: string) {
     return this.tripsService.completeTrip(user.schoolId, id, user);
-  }
-
-  @Post('offline-sync')
-  @ApiOperation({ summary: 'Batch sync offline operational events' })
-  syncBatch(@CurrentUser() user: any, @Body() body: TripSyncBatchDto) {
-    return this.tripsService.syncBatch(user.schoolId, body.events, user);
   }
 }

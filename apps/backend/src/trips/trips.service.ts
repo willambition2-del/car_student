@@ -7,11 +7,18 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StudentTripStatus } from '../common/enums';
 import { assertSchoolOperational } from '../common/utils/tenant-safety.util';
 
+import { NotificationsService } from '../notifications/notifications.service';
+import { TripsGateway } from './trips.gateway';
+
 type TripActor = { id: string; role: string };
 
 @Injectable()
 export class TripsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+    private tripsGateway: TripsGateway,
+  ) {}
 
   async findAll(
     schoolId: string,
@@ -26,6 +33,18 @@ export class TripsService {
     const where: any = { schoolId };
     if (actor?.role === 'SUPERVISOR') {
       where.supervisor = { schoolUserId: actor.id };
+    } else if (actor?.role === 'PARENT') {
+      where.tripStudents = {
+        some: {
+          student: {
+            guardianLinks: {
+              some: {
+                guardian: { schoolUserId: actor.id, isActive: true, deletedAt: null },
+              },
+            },
+          },
+        },
+      };
     }
 
     if (status && status !== 'ALL') {
@@ -114,7 +133,14 @@ export class TripsService {
         driver: { include: { schoolUser: true } },
         supervisor: { include: { schoolUser: true } },
         tripStudents: {
-          include: { student: { include: { locations: true } } },
+          include: {
+            student: {
+              include: {
+                locations: true,
+                guardianLinks: { include: { guardian: true } },
+              },
+            },
+          },
         },
         tripEvents: { orderBy: { createdAt: 'desc' } },
       },
@@ -124,20 +150,59 @@ export class TripsService {
       throw new NotFoundException('الرحلة غير موجودة');
     }
 
+    if (actor?.role === 'PARENT') {
+      const isChildInTrip = trip.tripStudents.some((ts) =>
+        ts.student?.guardianLinks?.some(
+          (gl) => gl.guardian?.schoolUserId === actor.id,
+        ),
+      );
+      if (!isChildInTrip) {
+        throw new NotFoundException('الرحلة غير موجودة أو غير مخصصة لك');
+      }
+
+      // Privacy: Only return parent's own children
+      trip.tripStudents = trip.tripStudents.filter((ts) =>
+        ts.student?.guardianLinks?.some(
+          (gl) => gl.guardian?.schoolUserId === actor.id,
+        ),
+      );
+    }
+
     return trip;
   }
 
   async startTrip(
     schoolId: string,
     data: {
-      routeId: string;
-      busId: string;
+      tripId?: string;
+      routeId?: string;
+      busId?: string;
       driverId?: string;
       supervisorId?: string;
       tripType?: any;
     },
     actor?: TripActor,
   ) {
+    if (data.tripId) {
+      // Start an existing scheduled trip
+      const trip = await this.findOne(schoolId, data.tripId, actor);
+      if (trip.status !== 'SCHEDULED') {
+        throw new BadRequestException('Trip is already started or completed');
+      }
+
+      return this.prisma.trip.update({
+        where: { id: data.tripId },
+        data: {
+          status: 'STARTED',
+          actualStartTime: new Date(),
+        },
+      });
+    }
+
+    if (!data.routeId || !data.busId) {
+      throw new BadRequestException('routeId and busId are required for new trips');
+    }
+
     const bus = await this.prisma.bus.findFirst({
       where: { id: data.busId, schoolId },
     });
@@ -153,6 +218,20 @@ export class TripsService {
       }
     }
 
+    if (data.driverId) {
+      const driver = await this.prisma.driver.findFirst({
+        where: { id: data.driverId, schoolId, deletedAt: null },
+      });
+      if (!driver) throw new BadRequestException('Driver does not belong to this school');
+    }
+
+    if (data.supervisorId) {
+      const supervisor = await this.prisma.supervisor.findFirst({
+        where: { id: data.supervisorId, schoolId, deletedAt: null },
+      });
+      if (!supervisor) throw new BadRequestException('Supervisor does not belong to this school');
+    }
+
     const route = await this.prisma.route.findFirst({
       where: { id: data.routeId, schoolId },
       include: { students: true },
@@ -166,8 +245,8 @@ export class TripsService {
       const trip = await tx.trip.create({
         data: {
           schoolId,
-          routeId: data.routeId,
-          busId: data.busId,
+          routeId: data.routeId!,
+          busId: data.busId!,
           driverId: data.driverId || bus.driverId,
           supervisorId: data.supervisorId || bus.supervisorId,
           tripType: data.tripType || route.tripType,
@@ -200,11 +279,13 @@ export class TripsService {
     status: StudentTripStatus,
     notes?: string,
     actor?: TripActor,
+    clientEventId?: string,
   ) {
     const trip = await this.findOne(schoolId, tripId, actor);
 
     const tripStudent = await this.prisma.tripStudent.findFirst({
       where: { tripId, studentId },
+      include: { student: true },
     });
 
     if (!tripStudent) {
@@ -229,16 +310,132 @@ export class TripsService {
       throw new BadRequestException('Invalid student trip status transition');
     }
 
-    return this.prisma.tripStudent.update({
-      where: { id: tripStudent.id },
-      data: {
-        status,
-        boardedAt: status === 'BOARDED' ? new Date() : tripStudent.boardedAt,
-        droppedOffAt:
-          status === 'DROPPED_OFF' ? new Date() : tripStudent.droppedOffAt,
-        notes,
-      },
+    const operationId = clientEventId || `op_online_${Date.now()}_${studentId}_${status}`;
+
+    // 1. Transaction to update TripStudent & create TripEvent
+    const updatedTripStudent = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.tripStudent.update({
+        where: { id: tripStudent.id },
+        data: {
+          status,
+          boardedAt: status === 'BOARDED' ? new Date() : tripStudent.boardedAt,
+          arrivedSchoolAt: status === 'ARRIVED_AT_SCHOOL' ? new Date() : tripStudent.arrivedSchoolAt,
+          droppedOffAt: status === 'DROPPED_OFF' ? new Date() : tripStudent.droppedOffAt,
+          absentMarkedAt: (status === 'ABSENT' || status === 'EXCUSED_ABSENCE') ? new Date() : tripStudent.absentMarkedAt,
+          notes,
+        },
+      });
+
+      // Create TripEvent
+      await tx.tripEvent.create({
+        data: {
+          operationId,
+          tripId,
+          studentId,
+          eventType: status,
+          previousStatus: tripStudent.status,
+          newStatus: status,
+          recordedBy: actor?.id || 'SYSTEM',
+          deviceTimestamp: new Date(),
+          source: clientEventId ? 'OFFLINE_SYNC' : 'ONLINE',
+          createdAt: new Date(),
+        },
+      });
+
+      return updated;
     });
+
+    // 2. Map status to Notification specs
+    const studentName = tripStudent.student?.fullName || 'الطالب';
+    let notifConfig: { type: string; title: string; body: string } | null = null;
+
+    if (status === 'BOARDED') {
+      notifConfig = {
+        type: 'STUDENT_BOARDED',
+        title: 'صعود الطالب',
+        body: `صعد ${studentName} إلى الحافلة.`,
+      };
+    } else if (status === 'ABSENT' || status === 'EXCUSED_ABSENCE') {
+      notifConfig = {
+        type: 'STUDENT_ABSENT',
+        title: 'غياب عن رحلة الحافلة',
+        body: `تم تسجيل ${studentName} كغائب عن رحلة الحافلة.`,
+      };
+    } else if (status === 'ARRIVED_AT_SCHOOL') {
+      notifConfig = {
+        type: 'STUDENT_ARRIVED_SCHOOL',
+        title: 'الوصول إلى المدرسة',
+        body: `وصل ${studentName} إلى المدرسة.`,
+      };
+    } else if (status === 'BOARDED_RETURN') {
+      notifConfig = {
+        type: 'STUDENT_BOARDED_RETURN',
+        title: 'صعود حافلة العودة',
+        body: `صعد ${studentName} إلى حافلة العودة.`,
+      };
+    } else if (status === 'DROPPED_OFF') {
+      notifConfig = {
+        type: 'STUDENT_DROPPED_OFF',
+        title: 'تم إنزال الطالب',
+        body: `تم إنزال ${studentName} بنجاح.`,
+      };
+    } else if (status === 'DELIVERY_FAILED') {
+      notifConfig = {
+        type: 'DELIVERY_FAILED',
+        title: 'تعذر تسليم الطالب',
+        body: `تعذر تسليم ${studentName} لعدم وجود مستلم.`,
+      };
+    }
+
+    // 3. Dispatch Notification to Parents
+    if (notifConfig) {
+      try {
+        const notif = await this.notificationsService.notifyStudentGuardians(schoolId, {
+          studentId,
+          tripId,
+          type: notifConfig.type as any,
+          title: notifConfig.title,
+          body: notifConfig.body,
+          operationId,
+          actionType: status,
+          metadata: {
+            notes,
+            supervisorId: trip.supervisorId,
+          },
+        });
+
+        // 4. Emit via Socket.IO if parents are connected
+        if (notif && this.tripsGateway?.server) {
+          const recipients = await this.prisma.notificationRecipient.findMany({
+            where: { notificationId: notif.id },
+          });
+          for (const r of recipients) {
+            this.tripsGateway.server.to(`user:${r.userId}`).emit('notification', {
+              id: notif.id,
+              type: notif.type,
+              title: notif.title,
+              body: notif.body,
+              studentId,
+              studentName,
+              tripId,
+              createdAt: notif.createdAt,
+            });
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 5. Emit real-time status changed to trip room
+    try {
+      this.tripsGateway.emitTripEvent(tripId, 'student_status_changed', {
+        studentId,
+        studentName,
+        status,
+        timestamp: new Date(),
+      });
+    } catch (_) {}
+
+    return updatedTripStudent;
   }
 
   async completeTrip(schoolId: string, id: string, actor?: TripActor) {
@@ -287,50 +484,27 @@ export class TripsService {
           continue;
         }
 
-        // 2. Validate Trip & School
-        const trip = await this.prisma.trip.findFirst({
-          where: { id: event.tripId, schoolId }
-        });
-        
+        // 2. Validate Trip & School & Supervisor ownership
+        const trip = await this.findOne(schoolId, event.tripId, actor);
         if (!trip) {
           results.rejected++;
           results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: 'Trip not found or unauthorized' });
           continue;
         }
 
-        // 3. Process Event
-        // Update the student status via existing logic, but catching errors gracefully
-        try {
-          await this.updateStudentStatus(
-            schoolId,
-            event.tripId,
-            event.studentId,
-            event.status,
-            'Offline Sync',
-            actor
-          );
+        // 3. Process Event via unified updateStudentStatus
+        await this.updateStudentStatus(
+          schoolId,
+          event.tripId,
+          event.studentId,
+          event.status,
+          'Offline Sync',
+          actor,
+          event.clientEventId
+        );
 
-          // Log the event with the clientEventId to prevent future duplicates
-          await this.prisma.tripEvent.create({
-            data: {
-              operationId: event.clientEventId,
-              tripId: event.tripId,
-              studentId: event.studentId,
-              eventType: event.status,
-              newStatus: event.status,
-              recordedBy: actor?.id || 'SYSTEM',
-              deviceTimestamp: event.timestamp ? new Date(event.timestamp) : new Date(),
-              source: 'OFFLINE_SYNC',
-              createdAt: event.timestamp ? new Date(event.timestamp) : new Date(),
-            }
-          });
-
-          results.accepted++;
-          results.details.push({ id: event.clientEventId, status: 'ACCEPTED' });
-        } catch (innerError: any) {
-          results.rejected++;
-          results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: innerError.message });
-        }
+        results.accepted++;
+        results.details.push({ id: event.clientEventId, status: 'ACCEPTED' });
       } catch (e: any) {
         results.rejected++;
         results.details.push({ id: event.clientEventId, status: 'REJECTED', reason: e.message });

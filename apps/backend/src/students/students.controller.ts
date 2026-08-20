@@ -27,6 +27,7 @@ import { ProximitySuggestionDto } from './dto/proximity-suggestion.dto';
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.TRANSPORT_MANAGER,
   SchoolRoleEnum.DATA_ENTRY,
+  SchoolRoleEnum.PARENT,
 )
 @Controller('school/students')
 export class StudentsController {
@@ -50,6 +51,7 @@ export class StudentsController {
       Number(limit) || 20,
       search,
       grade,
+      user,
     );
   }
 
@@ -72,22 +74,39 @@ export class StudentsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get student details' })
   findOne(@CurrentUser() user: any, @Param('id') id: string) {
-    return this.studentsService.findOne(user.schoolId, id);
+    return this.studentsService.findOne(user.schoolId, id, user);
   }
 
   @Post()
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.DATA_ENTRY,
+  )
   @ApiOperation({ summary: 'Create new student' })
   create(@CurrentUser() user: any, @Body() body: CreateStudentDto) {
     return this.studentsService.create(user.schoolId, body);
   }
 
   @Patch(':id')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+    SchoolRoleEnum.DATA_ENTRY,
+  )
   @ApiOperation({ summary: 'Update student info' })
   update(@CurrentUser() user: any, @Param('id') id: string, @Body() body: UpdateStudentDto) {
     return this.studentsService.update(user.schoolId, id, body);
   }
 
   @Delete(':id')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Soft delete student' })
   remove(@CurrentUser() user: any, @Param('id') id: string) {
     return this.studentsService.remove(user.schoolId, id);

@@ -191,6 +191,14 @@ export class BusesService {
 
   async remove(schoolId: string, id: string) {
     await this.findOne(schoolId, id);
+
+    const activeTrip = await this.prisma.trip.findFirst({
+      where: { busId: id, schoolId, status: 'STARTED' },
+    });
+    if (activeTrip) {
+      throw new BadRequestException('لا يمكن حذف الحافلة لوجود رحلة جارية حالياً');
+    }
+
     return this.prisma.bus.update({
       where: { id },
       data: { deletedAt: new Date() },

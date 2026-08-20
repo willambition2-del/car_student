@@ -9,6 +9,7 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/bottom_navigation.dart';
 import '../../core/widgets/dialogs_sheets.dart';
 import '../../mock/mock_repository.dart';
+import '../auth/services/auth_service.dart';
 
 class ParentProfileScreen extends ConsumerStatefulWidget {
   const ParentProfileScreen({super.key});
@@ -188,9 +189,22 @@ class _ParentProfileScreenState extends ConsumerState<ParentProfileScreen> {
                 AppDialog.show(
                   context: context,
                   title: 'تسجيل الخروج',
-                  content: 'هل أنت تأكد من رغبتك في تسجيل الخروج من الحساب؟',
+                  content: 'هل أنت متأكد من رغبتك في تسجيل الخروج من الحساب؟',
                   confirmText: 'تأكيد الخروج',
-                  onConfirm: () => context.go('/auth/login'),
+                  onConfirm: () async {
+                    await AuthService().logout();
+                    ref.invalidate(selectedRoleProvider);
+                    ref.invalidate(studentsListProvider);
+                    ref.invalidate(notificationsProvider);
+                    ref.invalidate(absenceRequestsProvider);
+                    ref.invalidate(addressRequestsProvider);
+                    ref.invalidate(activeTripProvider);
+                    ref.invalidate(scheduledTripsProvider);
+                    ref.read(selectedStudentIndexProvider.notifier).state = 0;
+                    if (context.mounted) {
+                      context.go('/auth/login');
+                    }
+                  },
                 );
               },
             ),

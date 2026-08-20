@@ -28,7 +28,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(SchoolRoleEnum.SCHOOL_OWNER, SchoolRoleEnum.SCHOOL_ADMIN, SchoolRoleEnum.TRANSPORT_MANAGER)
+  @Roles(SchoolRoleEnum.SCHOOL_OWNER, SchoolRoleEnum.SCHOOL_ADMIN)
   @ApiOperation({ summary: 'List school users' })
   findAll(
     @CurrentSchool() schoolId: string,

@@ -20,6 +20,7 @@ import { AddressRequestsService } from './address-requests.service';
   SchoolRoleEnum.SCHOOL_OWNER,
   SchoolRoleEnum.SCHOOL_ADMIN,
   SchoolRoleEnum.TRANSPORT_MANAGER,
+  SchoolRoleEnum.PARENT,
 )
 @Controller('school/address-requests')
 export class AddressRequestsController {
@@ -38,22 +39,28 @@ export class AddressRequestsController {
       Number(page) || 1,
       Number(limit) || 20,
       status,
+      user,
     );
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get address change request details' })
   findOne(@CurrentUser() user: any, @Param('id') id: string) {
-    return this.addressRequestsService.findOne(user.schoolId, id);
+    return this.addressRequestsService.findOne(user.schoolId, id, user);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create new address change request' })
   create(@CurrentUser() user: any, @Body() body: any) {
-    return this.addressRequestsService.create(user.schoolId, body);
+    return this.addressRequestsService.create(user.schoolId, body, user);
   }
 
   @Post(':id/approve')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({
     summary: 'Approve address change request and update student location',
   })
@@ -66,6 +73,11 @@ export class AddressRequestsController {
   }
 
   @Post(':id/reject')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Reject address change request' })
   reject(
     @CurrentUser() user: any,

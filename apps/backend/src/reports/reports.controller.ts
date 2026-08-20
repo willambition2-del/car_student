@@ -19,6 +19,11 @@ export class ReportsController {
   constructor(private reportsService: ReportsService) {}
 
   @Get('trips')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Get trips and operations analytics report' })
   getTripsReport(
     @CurrentUser() user: any,
@@ -33,6 +38,11 @@ export class ReportsController {
   }
 
   @Get('buses')
+  @Roles(
+    SchoolRoleEnum.SCHOOL_OWNER,
+    SchoolRoleEnum.SCHOOL_ADMIN,
+    SchoolRoleEnum.TRANSPORT_MANAGER,
+  )
   @ApiOperation({ summary: 'Get fleet and buses analytics report' })
   getBusesReport(@CurrentUser() user: any) {
     return this.reportsService.getBusesReport(user.schoolId);

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/bus_widgets.dart';
 import '../../mock/mock_repository.dart';
+import '../../mock/models/models.dart';
+import 'services/trip_service.dart';
 
 class SupervisorTripsListScreen extends ConsumerWidget {
   const SupervisorTripsListScreen({super.key});
@@ -27,7 +29,25 @@ class SupervisorTripsListScreen extends ConsumerWidget {
                       padding: const EdgeInsets.only(bottom: 10.0),
                       child: TripCard(
                         trip: trip,
-                        onTap: () => context.push('/supervisor/trip/active'),
+                        onTap: () async {
+                          if (trip.status != TripStatus.inProgress) {
+                            try {
+                              await ref.read(tripServiceProvider).startTrip(trip.id);
+                              ref.invalidate(activeTripProvider);
+                              ref.invalidate(scheduledTripsProvider);
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('فشل بدء الرحلة: $e')),
+                                );
+                              }
+                              return;
+                            }
+                          }
+                          if (context.mounted) {
+                            context.push('/supervisor/trip/active');
+                          }
+                        },
                       ),
                     );
                   },

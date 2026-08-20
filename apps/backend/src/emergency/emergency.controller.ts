@@ -39,13 +39,14 @@ export class EmergencyController {
       Number(page) || 1,
       Number(limit) || 20,
       status,
+      user,
     );
   }
 
   @Post('reports')
   @ApiOperation({ summary: 'Create emergency report' })
   createReport(@CurrentUser() user: any, @Body() body: any) {
-    return this.emergencyService.createReport(user.schoolId, body);
+    return this.emergencyService.createReport(user.schoolId, body, user);
   }
 
   @Post('reports/:id/resolve')

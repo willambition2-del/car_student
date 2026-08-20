@@ -4,14 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_radius.dart';
 import '../../app/theme/app_typography.dart';
-import '../../core/constants/app_constants.dart';
-
 import '../../core/widgets/app_buttons.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/app_text_fields.dart';
 import '../../mock/mock_repository.dart';
-import '../../mock/models/models.dart';
 import 'services/auth_service.dart';
+import '../../core/utils/role_route_mapper.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -61,23 +59,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           return;
         }
 
-        if (userRole == 'PARENT') {
-          ref.read(selectedRoleProvider.notifier).state = UserRole.parent;
-          context.go('/parent/home');
-        } else if (userRole == 'SUPERVISOR') {
-          ref.read(selectedRoleProvider.notifier).state = UserRole.supervisor;
-          context.go('/supervisor/home');
+        final enumRole = RoleRouteMapper.getUserRoleEnum(userRole);
+        final route = RoleRouteMapper.getRouteForRole(userRole);
 
-        } else if (userRole == 'SCHOOL_ADMIN' ||
-            userRole == 'TRANSPORT_MANAGER' ||
-            userRole == 'SCHOOL_OWNER') {
-          ref.read(selectedRoleProvider.notifier).state = UserRole.transportManager;
-          context.go('/transport/home');
-        } else {
-          // Default fallback if role is unknown, maybe parent
-          ref.read(selectedRoleProvider.notifier).state = UserRole.parent;
-          context.go('/parent/home');
+        if (enumRole != null) {
+          ref.read(selectedRoleProvider.notifier).state = enumRole;
         }
+
+        context.go(route);
       } catch (e) {
         if (!mounted) return;
         setState(() {

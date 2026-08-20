@@ -34,7 +34,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Throttle({ default: { limit: 50, ttl: 60000 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login for platform and school users' })
   login(

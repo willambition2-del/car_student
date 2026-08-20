@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/sync/sync_service.dart';
-import '../features/transport_manager/services/requests_service.dart';
 import '../features/supervisor/services/trip_service.dart';
 
 import '../core/network/api_client.dart';
@@ -242,14 +241,20 @@ final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
 final studentsListProvider = FutureProvider<List<StudentModel>>((ref) async {
   final api = ref.read(apiClientProvider);
   try {
-    final response = await api.get('/students');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => StudentModel.fromJson(e as Map<String, dynamic>)).toList();
+    final response = await api.get('/school/students');
+    final data = response['data'];
+    List? list;
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data['items'] is List) {
+      list = data['items'];
     }
-    return MockData.students;
+    if (list != null) {
+      return list.map((e) => StudentModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return [];
   } catch (e) {
-    return MockData.students;
+    return [];
   }
 });
 
@@ -269,14 +274,45 @@ final scheduledTripsProvider = FutureProvider<List<TripModel>>((ref) async {
   final tripService = ref.read(tripServiceProvider);
   return tripService.getScheduledTrips();
 });
+
 final addressRequestsProvider = FutureProvider<List<AddressRequestModel>>((ref) async {
-  final service = ref.read(requestsServiceProvider);
-  return service.getAddressRequests();
+  final api = ref.read(apiClientProvider);
+  try {
+    final response = await api.get('/school/address-requests');
+    final data = response['data'];
+    List? list;
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data['items'] is List) {
+      list = data['items'];
+    }
+    if (list != null) {
+      return list.map((e) => AddressRequestModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
 });
 
 final absenceRequestsProvider = FutureProvider<List<AbsenceRequestModel>>((ref) async {
-  final service = ref.read(requestsServiceProvider);
-  return service.getAbsenceRequests();
+  final api = ref.read(apiClientProvider);
+  try {
+    final response = await api.get('/school/absence-requests');
+    final data = response['data'];
+    List? list;
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data['items'] is List) {
+      list = data['items'];
+    }
+    if (list != null) {
+      return list.map((e) => AbsenceRequestModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
 });
 
 final syncOperationsProvider = FutureProvider<List<SyncOperationModel>>((ref) async {
@@ -316,13 +352,26 @@ final supportTicketsProvider = FutureProvider<List<SupportTicketModel>>((ref) as
 final notificationsProvider = FutureProvider<List<NotificationItemModel>>((ref) async {
   final api = ref.read(apiClientProvider);
   try {
-    final response = await api.get('/notifications');
-    final data = response['data'] as List?;
-    if (data != null) {
-      return data.map((e) => NotificationItemModel.fromJson(e as Map<String, dynamic>)).toList();
+    final response = await api.get('/school/notifications/my');
+    final data = response['data'];
+    List? list;
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data['items'] is List) {
+      list = data['items'];
     }
-    return MockData.notifications;
+    if (list != null) {
+      return list.map((e) => NotificationItemModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    return [];
   } catch (e) {
-    return MockData.notifications;
+    try {
+      final unreadResponse = await api.get('/school/notifications/unread');
+      final unreadData = unreadResponse['data'];
+      if (unreadData is List) {
+        return unreadData.map((e) => NotificationItemModel.fromJson(e as Map<String, dynamic>)).toList();
+      }
+    } catch (_) {}
+    return [];
   }
 });
