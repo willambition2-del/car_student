@@ -10,10 +10,13 @@ void main() {
     };
 
     await tester.pumpWidget(
-      ProviderScope(
+      const ProviderScope(
         child: MaterialApp(
-          home: Scaffold(
-            body: SupervisorActiveTripScreen(),
+          home: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Scaffold(
+              body: SupervisorActiveTripScreen(),
+            ),
           ),
         ),
       ),
