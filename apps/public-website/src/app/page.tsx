@@ -15,10 +15,10 @@ export default function Home() {
             <a href="#faq" className="text-gray-600 hover:text-blue-600">الأسئلة الشائعة</a>
           </nav>
           <div className="flex gap-4">
-            <a href="http://localhost:3002/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
+            <a href={process.env.NEXT_PUBLIC_SCHOOL_DASHBOARD_URL || "http://localhost:3002/login"} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
               دخول المدارس
             </a>
-            <a href="http://localhost:3001/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
+            <a href={process.env.NEXT_PUBLIC_PLATFORM_ADMIN_URL || "http://localhost:3001/login"} className="text-sm font-medium text-gray-700 hover:text-blue-600 flex items-center">
               دخول المنصة
             </a>
             <Link href="/demo" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">

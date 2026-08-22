@@ -7,6 +7,14 @@ describe('RoutesService tenant isolation', () => {
 
   beforeEach(() => {
     prisma = {
+      $transaction: jest.fn(async (cb) => cb(prisma)),
+      $executeRaw: jest.fn().mockResolvedValue(1),
+      school: {
+        findUnique: jest.fn().mockResolvedValue({
+          status: 'ACTIVE',
+          subscriptions: [{ status: 'ACTIVE', endDate: new Date(Date.now() + 86400000) }],
+        }),
+      },
       bus: { findFirst: jest.fn() },
       student: { findFirst: jest.fn() },
       routeStop: { findFirst: jest.fn() },

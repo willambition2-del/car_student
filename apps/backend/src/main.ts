@@ -20,7 +20,7 @@ async function bootstrap() {
   const port = configService.get<number>('app.port', 3000);
   const apiPrefix = configService.get<string>('app.apiPrefix', 'api/v1');
   const corsOrigins = configService.get<string[]>('cors.origins', []);
-  const swaggerEnabled = configService.get<boolean>('swagger.enabled', true);
+  const swaggerEnabled = configService.get<boolean>('swagger.enabled', false);
 
   // Security & Optimization
   app.use(helmet());

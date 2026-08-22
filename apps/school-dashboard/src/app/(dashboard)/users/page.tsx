@@ -16,11 +16,11 @@ export default function UsersListPage() {
     setIsLoading(true);
     try {
       const data = await schoolUsersApi.getUsers();
-      if (data && data.items && data.items.length > 0) {
+      if (data && data.items) {
         setUsers(data.items);
       }
     } catch {
-      // Fallback to mock data if API offline
+      // Offline / error
     } finally {
       setIsLoading(false);
     }

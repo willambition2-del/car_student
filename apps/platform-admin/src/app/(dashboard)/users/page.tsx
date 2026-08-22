@@ -8,40 +8,19 @@ import { Button } from "@/components/ui/button";
 import { UserPlus, Lock, Mail, RefreshCw, AlertCircle } from "lucide-react";
 import { platformUsersApi, UserProfile } from "@/lib/api";
 
-const mockPlatformUsersList = [
-  {
-    id: "pusr-1",
-    fullName: "مالك المنصة (سليمان المنصور)",
-    email: "owner@schooltransport-saas.com",
-    phone: "0509988776",
-    role: "PLATFORM_OWNER",
-    status: "نشط",
-    lastLogin: "2026-08-01 11:30",
-  },
-  {
-    id: "pusr-2",
-    fullName: "فريق الدعم الفني",
-    email: "support@schooltransport-saas.com",
-    phone: "0551122334",
-    role: "PLATFORM_SUPPORT",
-    status: "نشط",
-    lastLogin: "2026-08-01 09:15",
-  },
-];
-
 export default function PlatformUsersPage() {
-  const [users, setUsers] = useState<any[]>(mockPlatformUsersList);
+  const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
       const data = await platformUsersApi.getUsers();
-      if (data && data.items && data.items.length > 0) {
+      if (data && data.items) {
         setUsers(data.items);
       }
     } catch {
-      // Fallback to mock data if offline
+      // Offline / error
     } finally {
       setIsLoading(false);
     }

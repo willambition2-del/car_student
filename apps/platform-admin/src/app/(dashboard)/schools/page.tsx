@@ -8,34 +8,19 @@ import { Button } from "@/components/ui/button";
 import { platformSchoolsApi } from "@/lib/api";
 import { School, Plus, Eye, Edit, RefreshCw } from "lucide-react";
 
-const mockSchoolsList = [
-  {
-    id: "school-demo-001",
-    nameAr: "مدارس المستقبل الأهلية",
-    slug: "al-mustaqbal",
-    city: "الرياض",
-    phone: "+966112345678",
-    email: "info@almustaqbal.edu.sa",
-    status: "ACTIVE",
-    studentsCount: 2,
-    busesCount: 1,
-    activePlan: "الباقة الاحترافية",
-  },
-];
-
 export default function SchoolsListPage() {
-  const [schools, setSchools] = useState<any[]>(mockSchoolsList);
+  const [schools, setSchools] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchSchools = async () => {
     setIsLoading(true);
     try {
       const data = await platformSchoolsApi.getSchools();
-      if (data && data.items && data.items.length > 0) {
+      if (data && data.items) {
         setSchools(data.items);
       }
     } catch {
-      // Fallback to mock data if offline
+      // Offline / error
     } finally {
       setIsLoading(false);
     }

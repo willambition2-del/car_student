@@ -375,12 +375,12 @@ export const platformSupportApi = {
       status,
     }).toString();
     return apiRequest<{ items: any[]; total: number }>(
-      `/platform/support?${query}`,
+      `/platform/support/tickets?${query}`,
     );
   },
-  getTicket: async (id: string) => apiRequest(`/platform/support/${id}`),
+  getTicket: async (id: string) => apiRequest(`/platform/support/tickets/${id}`),
   replyTicket: async (id: string, content: string) =>
-    apiRequest(`/platform/support/${id}/messages`, {
+    apiRequest(`/platform/support/tickets/${id}/messages`, {
       method: "POST",
       body: JSON.stringify({ content }),
     }),
@@ -394,14 +394,14 @@ export const platformAuditApi = {
       search,
     }).toString();
     return apiRequest<{ items: any[]; total: number }>(
-      `/platform/audit?${query}`,
+      `/platform/audit/logs?${query}`,
     );
   },
-  getLog: async (id: string) => apiRequest(`/platform/audit/${id}`),
+  getLog: async (id: string) => apiRequest(`/platform/audit/logs/${id}`),
 };
 
 export const platformHealthApi = {
   getHealth: async () => apiRequest("/health"),
   getDbHealth: async () => apiRequest("/health/db"),
-  getSystemHealth: async () => apiRequest("/platform/system-health"),
+  getSystemHealth: async () => apiRequest("/platform/health"),
 };
